@@ -68,22 +68,25 @@ void
 OpenGymEnv::SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface)
 {
   NS_LOG_FUNCTION (this);
+  
   m_openGymInterface = openGymInterface;
   openGymInterface->SetGetActionSpaceCb( MakeCallback (&OpenGymEnv::GetActionSpace, this) );
   openGymInterface->SetGetObservationSpaceCb( MakeCallback (&OpenGymEnv::GetObservationSpace, this) );
   
-  openGymInterface->SetGetModelSpaceCb( MakeCallback (&OpenGymEnv::GetModelSpace, this) );
+  if(openGymInterface->IsFedLearning())
+  {
+    openGymInterface->SetGetModelSpaceCb( MakeCallback (&OpenGymEnv::GetModelSpace, this) );
+    openGymInterface->SetExecuteModelcb( MakeCallback(&OpenGymEnv::ExecuteModel,this) );
+    openGymInterface->SetGetModelCb( MakeCallback (&OpenGymEnv::GetModel, this) );    
+  }
 
   openGymInterface->SetGetGameOverCb( MakeCallback (&OpenGymEnv::GetGameOver, this) );
-  
   openGymInterface->SetGetObservationCb( MakeCallback (&OpenGymEnv::GetObservation, this) );
-  openGymInterface->SetGetModelCb( MakeCallback (&OpenGymEnv::GetModel, this) );
-
   openGymInterface->SetGetRewardCb( MakeCallback (&OpenGymEnv::GetReward, this) );
   openGymInterface->SetGetExtraInfoCb( MakeCallback (&OpenGymEnv::GetExtraInfo, this) );
   openGymInterface->SetExecuteActionsCb( MakeCallback (&OpenGymEnv::ExecuteActions, this) );
   
-  openGymInterface->SetExecuteModelcb( MakeCallback(&OpenGymEnv::ExecuteModel,this) );
+  
 }
 
 void

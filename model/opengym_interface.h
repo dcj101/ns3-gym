@@ -40,6 +40,7 @@ public:
   static Ptr<OpenGymInterface> Get (uint32_t port=5555);
 
   OpenGymInterface (uint32_t port=5555);
+  OpenGymInterface (bool isFedLearning, uint32_t port=5555);
   virtual ~OpenGymInterface ();
 
   static TypeId GetTypeId ();
@@ -57,6 +58,9 @@ public:
   Ptr<OpenGymDataContainer> GetObservation();
   float GetReward();
   bool IsGameOver();
+
+  bool IsFedLearning();
+
   std::string GetExtraInfo();
   bool ExecuteActions(Ptr<OpenGymDataContainer> action);
 
@@ -90,6 +94,9 @@ protected:
 private:
   static Ptr<OpenGymInterface> *DoGet (uint32_t port=5555);
   static void Delete (void);
+
+  
+
   uint32_t m_trainLoop;
   uint32_t m_port;
   zmq::context_t m_zmq_context;
@@ -99,7 +106,7 @@ private:
   bool m_simEnd;
   bool m_stopEnvRequested;
   bool m_initSimMsgSent;
-  
+  bool m_fedLearning;
 
   Callback< Ptr<OpenGymSpace> > m_actionSpaceCb;
   Callback< Ptr<OpenGymSpace> > m_observationSpaceCb;

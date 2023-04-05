@@ -96,10 +96,18 @@ OpenGymInterface::Delete (void)
 
 OpenGymInterface::OpenGymInterface(uint32_t port):
   m_trainLoop(10), m_port(port), m_zmq_context(1), m_zmq_socket(m_zmq_context, ZMQ_REQ),m_zmq_socket_mutipart(),
-  m_simEnd(false), m_stopEnvRequested(false), m_initSimMsgSent(false)
+  m_simEnd(false), m_stopEnvRequested(false), m_initSimMsgSent(false), m_fedLearning(false)
 {
   NS_LOG_FUNCTION (this);
 }
+
+OpenGymInterface::OpenGymInterface(bool isFedLearning, uint32_t port):
+  m_trainLoop(10), m_port(port), m_zmq_context(1), m_zmq_socket(m_zmq_context, ZMQ_REQ),m_zmq_socket_mutipart(),
+  m_simEnd(false), m_stopEnvRequested(false), m_initSimMsgSent(false), m_fedLearning(isFedLearning)
+{
+  NS_LOG_FUNCTION (this);
+}
+
 
 OpenGymInterface::~OpenGymInterface ()
 {
@@ -203,6 +211,7 @@ OpenGymInterface::Init()
 
   Ptr<OpenGymSpace> obsSpace = GetObservationSpace();
   Ptr<OpenGymSpace> actionSpace = GetActionSpace();
+  Ptr<OpenGymSpace> modelSpace = GetModelSpace();
 
   NS_LOG_UNCOND("Simulation process id: " << ::getpid() << " (parent (waf shell) id: " << ::getppid() << ")");
   NS_LOG_UNCOND("Waiting for Python process to connect on port: "<< connectAddr);
@@ -224,6 +233,12 @@ OpenGymInterface::Init()
     simInitMsg.mutable_actspace()->CopyFrom(spaceDesc);
   }
 
+  if(modelSpace) {
+    ns3opengym::SpaceDescription spaceDesc;
+    spaceDesc = modelSpace->GetSpaceDescription();
+    simInitMsg.mutable_modspace()->CopyFrom(spaceDesc);
+  }
+  
   // send init msg to python
   zmq::message_t request(simInitMsg.ByteSize());;
   simInitMsg.SerializeToArray(request.data(), simInitMsg.ByteSize());
@@ -296,11 +311,7 @@ OpenGymInterface::NotifyCurrentState()
   m_zmq_socket.send (request, zmq::send_flags::none);
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
-  NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
   NS_LOG_FUNCTION (this << "-----------------------Waiting for responed-----------------------------\n");
-  NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
-  NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
-  NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
  
@@ -308,7 +319,7 @@ OpenGymInterface::NotifyCurrentState()
   // 如果不是SendModel整数倍的话，就是py那边反馈还是action
  
  
-  if(m_trainLoop % SendModel) 
+  if(!m_fedLearning || m_trainLoop % SendModel) 
   {
     // receive act msg form python
     ns3opengym::EnvActMsg envActMsg;
@@ -408,6 +419,13 @@ OpenGymInterface::IsGameOver()
     gameOver = m_gameOverCb();
   }
   return (gameOver || m_simEnd);
+}
+
+bool
+OpenGymInterface::IsFedLearning()
+{
+  NS_LOG_FUNCTION(this);
+  return m_fedLearning;
 }
 
 Ptr<OpenGymSpace>
