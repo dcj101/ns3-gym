@@ -48,8 +48,7 @@ Ptr<OpenGymSpace> MyGetActionSpace(void)
 {
   uint32_t nodeNum = 5;
 
-  // Ptr<OpenGymDiscreteSpace> space = CreateObject<OpenGymDiscreteSpace> (nodeNum);
-  Ptr<OpenGymBoxSpace> space = CreateObject<OpenGymBoxSpace> (nodeNum);
+  Ptr<OpenGymDiscreteSpace> space = CreateObject<OpenGymDiscreteSpace> (nodeNum);
   NS_LOG_UNCOND ("MyGetActionSpace: " << space);
   return space;
 }
@@ -121,7 +120,7 @@ Execute received actions
 */
 bool MyExecuteActions(Ptr<OpenGymDataContainer> action)
 {
-  Ptr<OpenGymBoxSpace> discrete = DynamicCast<OpenGymDiscreteContainer>(action);
+  Ptr<OpenGymDiscreteContainer> discrete = DynamicCast<OpenGymDiscreteContainer>(action);
   NS_LOG_UNCOND ("MyExecuteActions: " << action);
   return true;
 }

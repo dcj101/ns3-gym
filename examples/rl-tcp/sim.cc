@@ -201,7 +201,7 @@ int main (int argc, char *argv[])
       TypeId tcpTid;
 
       NS_ABORT_MSG_UNLESS (TypeId::LookupByNameFailSafe (transport_prot, &tcpTid), "TypeId " << transport_prot << " not found");
-      // 这里设置了聚合对象
+      // 这里设置了聚合对象 可以创建对像
       Config::SetDefault ("ns3::TcpL4Protocol::SocketType", TypeIdValue (TypeId::LookupByName (transport_prot)));
     }
 

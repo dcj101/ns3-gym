@@ -40,13 +40,16 @@ public:
 
   virtual Ptr<OpenGymSpace> GetActionSpace() = 0;
   virtual Ptr<OpenGymSpace> GetObservationSpace() = 0;
+  virtual Ptr<OpenGymSpace> GetModelSpace();
   // TODO:  get all in one function like below, do we need it?
   //virtual void GetEnvState(Ptr<OpenGymDataContainer>  &obs, float &reward, bool &done, std::string &info) = 0;
   virtual bool GetGameOver() = 0;
   virtual Ptr<OpenGymDataContainer> GetObservation() = 0;
+  virtual Ptr<OpenGymDataContainer> GetModel();
   virtual float GetReward() = 0;
   virtual std::string GetExtraInfo() = 0;
   virtual bool ExecuteActions(Ptr<OpenGymDataContainer> action) = 0;
+  virtual bool ExecuteModel(Ptr<OpenGymDataContainer> model);
 
   void SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface);
   void Notify();

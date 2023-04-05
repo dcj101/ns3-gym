@@ -24,6 +24,9 @@
 
 #include "ns3/object.h"
 #include <zmq.hpp>
+#include <zmq_addon.hpp>
+
+const int SendModel = 10;
 
 namespace ns3 {
 
@@ -49,6 +52,8 @@ public:
 
   Ptr<OpenGymSpace> GetActionSpace();
   Ptr<OpenGymSpace> GetObservationSpace();
+  Ptr<OpenGymSpace> GetModelSpace();
+
   Ptr<OpenGymDataContainer> GetObservation();
   float GetReward();
   bool IsGameOver();
@@ -57,11 +62,23 @@ public:
 
   void SetGetActionSpaceCb(Callback< Ptr<OpenGymSpace> > cb);
   void SetGetObservationSpaceCb(Callback< Ptr<OpenGymSpace> > cb);
+  //设置模型的空间类型
+  void SetGetModelSpaceCb(Callback< Ptr<OpenGymSpace> > cb);
+
+
   void SetGetObservationCb(Callback< Ptr<OpenGymDataContainer> > cb);
+  //设置获取 中心服务器 传回来的模型回调
+  void SetGetModelCb(Callback< Ptr<OpenGymDataContainer> > cb);
+
   void SetGetRewardCb(Callback<float> cb);
   void SetGetGameOverCb(Callback< bool > cb);
   void SetGetExtraInfoCb(Callback<std::string> cb);
+
+
   void SetExecuteActionsCb(Callback<bool, Ptr<OpenGymDataContainer> > cb);
+  // 设置模型接收到的回调动作
+  void SetExecuteModelcb(Callback<bool, Ptr<OpenGymDataContainer> > cb);
+
 
   void Notify(Ptr<OpenGymEnv> entity);
 
@@ -73,22 +90,32 @@ protected:
 private:
   static Ptr<OpenGymInterface> *DoGet (uint32_t port=5555);
   static void Delete (void);
-
+  uint32_t m_trainLoop;
   uint32_t m_port;
   zmq::context_t m_zmq_context;
   zmq::socket_t m_zmq_socket;
+  zmq::multipart_t m_zmq_socket_mutipart;
 
   bool m_simEnd;
   bool m_stopEnvRequested;
   bool m_initSimMsgSent;
+  
 
   Callback< Ptr<OpenGymSpace> > m_actionSpaceCb;
   Callback< Ptr<OpenGymSpace> > m_observationSpaceCb;
+  Callback< Ptr<OpenGymSpace> > m_ModelSpaceCb;
+
   Callback< bool > m_gameOverCb;
+  
   Callback< Ptr<OpenGymDataContainer> > m_obsCb;
+  Callback< Ptr<OpenGymDataContainer> > m_modelgetCb;
+
   Callback<float> m_rewardCb;
   Callback<std::string> m_extraInfoCb;
+  
   Callback<bool, Ptr<OpenGymDataContainer> > m_actionCb;
+  Callback<bool, Ptr<OpenGymDataContainer> > m_modelactionCb;
+
 };
 
 } // end of namespace ns3

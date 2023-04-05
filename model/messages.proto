@@ -14,7 +14,8 @@ enum MsgType {
 	Reward = 6;
 	ExtraInfo = 7;
 	Action = 8;
-	StopEnv = 9;
+	Model = 9;
+	StopEnv = 10;
 }
 
 enum SpaceType {
@@ -97,6 +98,7 @@ message SimInitMsg {
 	uint64 wafShellProcessId = 2;
 	SpaceDescription obsSpace = 3;
 	SpaceDescription actSpace = 4;
+	SpaceDescription modSpace = 5;
 }
 
 message SimInitAck {
@@ -119,6 +121,11 @@ message EnvStateMsg {
 
 message EnvActMsg {
 	DataContainer actData = 1;
+	bool stopSimReq = 2;
+}
+
+message EnvModelMsg {
+	DataContainer ModeData = 1;
 	bool stopSimReq = 2;
 }
 //------------------------//

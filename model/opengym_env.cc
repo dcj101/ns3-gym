@@ -71,11 +71,19 @@ OpenGymEnv::SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface)
   m_openGymInterface = openGymInterface;
   openGymInterface->SetGetActionSpaceCb( MakeCallback (&OpenGymEnv::GetActionSpace, this) );
   openGymInterface->SetGetObservationSpaceCb( MakeCallback (&OpenGymEnv::GetObservationSpace, this) );
+  
+  openGymInterface->SetGetModelSpaceCb( MakeCallback (&OpenGymEnv::GetModelSpace, this) );
+
   openGymInterface->SetGetGameOverCb( MakeCallback (&OpenGymEnv::GetGameOver, this) );
+  
   openGymInterface->SetGetObservationCb( MakeCallback (&OpenGymEnv::GetObservation, this) );
+  openGymInterface->SetGetModelCb( MakeCallback (&OpenGymEnv::GetModel, this) );
+
   openGymInterface->SetGetRewardCb( MakeCallback (&OpenGymEnv::GetReward, this) );
   openGymInterface->SetGetExtraInfoCb( MakeCallback (&OpenGymEnv::GetExtraInfo, this) );
   openGymInterface->SetExecuteActionsCb( MakeCallback (&OpenGymEnv::ExecuteActions, this) );
+  
+  openGymInterface->SetExecuteModelcb( MakeCallback(&OpenGymEnv::ExecuteModel,this) );
 }
 
 void
@@ -96,6 +104,34 @@ OpenGymEnv::NotifySimulationEnd()
   {
     m_openGymInterface->NotifySimulationEnd();
   }
+}
+// -----------------------
+// -----------------------
+// -----------------------
+// -----------------------
+// -----------------------
+
+Ptr<OpenGymSpace>
+OpenGymEnv::GetModelSpace()
+{
+  NS_LOG_FUNCTION(this << " nothing to do you have to override !!!");  
+  Ptr<OpenGymBoxSpace> box = CreateObject<OpenGymBoxSpace>();
+  return box;
+}
+
+bool
+OpenGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> model)
+{
+  NS_LOG_FUNCTION(this << " nothing to do you have to override !!!");
+  return 1;
+}
+
+Ptr<OpenGymDataContainer>
+OpenGymEnv::GetModel()
+{
+  NS_LOG_FUNCTION(this << " nothing to do you have to override !!!");
+  Ptr<OpenGymBoxContainer<uint32_t> > box = CreateObject<OpenGymBoxContainer<uint32_t> >();
+  return box;
 }
 
 }

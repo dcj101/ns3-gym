@@ -95,7 +95,7 @@ OpenGymInterface::Delete (void)
 }
 
 OpenGymInterface::OpenGymInterface(uint32_t port):
-  m_port(port), m_zmq_context(1), m_zmq_socket(m_zmq_context, ZMQ_REQ),
+  m_trainLoop(10), m_port(port), m_zmq_context(1), m_zmq_socket(m_zmq_context, ZMQ_REQ),m_zmq_socket_mutipart(),
   m_simEnd(false), m_stopEnvRequested(false), m_initSimMsgSent(false)
 {
   NS_LOG_FUNCTION (this);
@@ -132,6 +132,13 @@ OpenGymInterface::SetGetObservationSpaceCb(Callback< Ptr<OpenGymSpace> > cb)
   m_observationSpaceCb = cb;
 }
 
+void 
+OpenGymInterface::SetGetModelSpaceCb(Callback< Ptr<OpenGymSpace> > cb)
+{
+  NS_LOG_FUNCTION(this);
+  m_ModelSpaceCb = cb;
+}
+
 void
 OpenGymInterface::SetGetGameOverCb(Callback< bool > cb)
 {
@@ -144,6 +151,13 @@ OpenGymInterface::SetGetObservationCb(Callback< Ptr<OpenGymDataContainer> > cb)
 {
   NS_LOG_FUNCTION (this);
   m_obsCb = cb;
+}
+
+void 
+OpenGymInterface::SetGetModelCb(Callback< Ptr<OpenGymDataContainer> > cb)
+{
+  NS_LOG_FUNCTION(this);
+  m_modelgetCb = cb;
 }
 
 void
@@ -165,6 +179,13 @@ OpenGymInterface::SetExecuteActionsCb(Callback<bool, Ptr<OpenGymDataContainer> >
 {
   NS_LOG_FUNCTION (this);
   m_actionCb = cb;
+}
+
+void 
+OpenGymInterface::SetExecuteModelcb(Callback<bool, Ptr<OpenGymDataContainer> > cb)
+{
+  NS_LOG_FUNCTION(this);
+  m_modelactionCb = cb;
 }
 
 void 
@@ -231,7 +252,6 @@ void
 OpenGymInterface::NotifyCurrentState()
 {
   NS_LOG_FUNCTION (this);
-
   if (!m_initSimMsgSent) {
     Init();
   }
@@ -283,32 +303,81 @@ OpenGymInterface::NotifyCurrentState()
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
+ 
+ 
+  // 如果不是SendModel整数倍的话，就是py那边反馈还是action
+ 
+ 
+  if(m_trainLoop % SendModel) 
+  {
+    // receive act msg form python
+    ns3opengym::EnvActMsg envActMsg;
+    zmq::message_t reply;
+    (void) m_zmq_socket.recv (reply, zmq::recv_flags::none);
+    envActMsg.ParseFromArray(reply.data(), reply.size());
 
-  // receive act msg form python
-  ns3opengym::EnvActMsg envActMsg;
-  zmq::message_t reply;
-  (void) m_zmq_socket.recv (reply, zmq::recv_flags::none);
-  envActMsg.ParseFromArray(reply.data(), reply.size());
+    if (m_simEnd) 
+    {
+      // if sim end only rx ms and quit
+      return;
+    }
 
-  if (m_simEnd) {
-    // if sim end only rx ms and quit
-    return;
+    bool stopSim = envActMsg.stopsimreq();
+    if (stopSim) 
+    {
+      NS_LOG_DEBUG("---Stop requested: " << stopSim);
+      m_stopEnvRequested = true;
+      Simulator::Stop();
+      Simulator::Destroy ();
+      std::exit(0);
+    }
+
+    // first step after reset is called without actions, just to get current state
+    ns3opengym::DataContainer actDataContainerPbMsg = envActMsg.actdata();
+    Ptr<OpenGymDataContainer> actDataContainer = OpenGymDataContainer::CreateFromDataContainerPbMsg(actDataContainerPbMsg);
+    ExecuteActions(actDataContainer);
+    
+  } 
+  // 防止Q表过大一次性读完
+  else 
+  
+  {
+    // 使用 zmq::recv_multipart() 方法一次性读取所有帧
+    m_zmq_socket_mutipart.recv(m_zmq_socket);
+    // 创建 Protobuf 消息对象
+    ns3opengym::EnvModelMsg envModelMsg;
+    // 处理消息的多个帧
+    for (size_t i = 0; i < m_zmq_socket_mutipart.size(); ++i) 
+    {
+        // 使用 frame.data() 和 frame.size() 来访问帧的数据
+        // 将数据追加复制到 Protobuf 消息对象中
+        zmq::message_t frame = m_zmq_socket_mutipart.pop();
+        ns3opengym::EnvModelMsg subModel;
+        subModel.ParseFromArray(frame.data(), frame.size());
+        NS_LOG_DEBUG(" Model recv =>>> " << static_cast<char*>(frame.data()) << frame.size());
+        envModelMsg.MergeFrom(subModel);
+    }
+
+    if (m_simEnd) 
+    {
+      return;
+    }
+
+    bool stopSim = envModelMsg.stopsimreq();
+    if (stopSim) 
+    {
+      NS_LOG_DEBUG("---Stop requested: " << stopSim);
+      m_stopEnvRequested = true;
+      Simulator::Stop();
+      Simulator::Destroy ();
+      std::exit(0);
+    }
+
+    ns3opengym::DataContainer actDataContainerPbMsg = envModelMsg.modedata();
+    Ptr<OpenGymDataContainer> actDataContainer = OpenGymDataContainer::CreateFromDataContainerPbMsg(actDataContainerPbMsg);
   }
-
-  bool stopSim = envActMsg.stopsimreq();
-  if (stopSim) {
-    NS_LOG_DEBUG("---Stop requested: " << stopSim);
-    m_stopEnvRequested = true;
-    Simulator::Stop();
-    Simulator::Destroy ();
-    std::exit(0);
-  }
-
-  // first step after reset is called without actions, just to get current state
-  ns3opengym::DataContainer actDataContainerPbMsg = envActMsg.actdata();
-  Ptr<OpenGymDataContainer> actDataContainer = OpenGymDataContainer::CreateFromDataContainerPbMsg(actDataContainerPbMsg);
-  ExecuteActions(actDataContainer);
-
+  m_trainLoop += 1;
+  return;
 }
 
 void
@@ -363,6 +432,18 @@ OpenGymInterface::GetObservationSpace()
     obsSpace = m_observationSpaceCb();
   }
   return obsSpace;
+}
+
+Ptr<OpenGymSpace>
+OpenGymInterface::GetModelSpace()
+{
+  NS_LOG_FUNCTION(this);
+  Ptr<OpenGymSpace> modeSpace;
+  if(!m_ModelSpaceCb.IsNull())
+  {
+    modeSpace = m_ModelSpaceCb();
+  }
+  return modeSpace;
 }
 
 Ptr<OpenGymDataContainer>

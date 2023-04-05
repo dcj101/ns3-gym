@@ -231,6 +231,10 @@ class Ns3ZmqBridge(object):
         self.newStateRx = False
         return True
 
+    #dcj
+    def send_model(self, model):
+        
+
     def step(self, actions):
         # exec actions for current state
         self.send_actions(actions)
@@ -388,6 +392,8 @@ class Ns3Env(gym.Env):
         self.ns3ZmqBridge.initialize_env(self.stepTime)
         self.action_space = self.ns3ZmqBridge.get_action_space()
         self.observation_space = self.ns3ZmqBridge.get_observation_space()
+        #dcj
+        self.model_space = self.ns3ZmqBridge.get_model_space()
         # get first observations
         self.ns3ZmqBridge.rx_env_state()
         self.envDirty = False
@@ -396,7 +402,7 @@ class Ns3Env(gym.Env):
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
-    #获取当前状态
+    #获取当前训练环境的状态信息
     def get_state(self):
         obs = self.ns3ZmqBridge.get_obs()
         reward = self.ns3ZmqBridge.get_reward()
@@ -423,6 +429,8 @@ class Ns3Env(gym.Env):
         self.ns3ZmqBridge.initialize_env(self.stepTime)
         self.action_space = self.ns3ZmqBridge.get_action_space()
         self.observation_space = self.ns3ZmqBridge.get_observation_space()
+        #dcj
+        self.model_space = self.ns3ZmqBridge.get_model_space()
         # get first observations
         self.ns3ZmqBridge.rx_env_state()
         obs = self.ns3ZmqBridge.get_obs()
