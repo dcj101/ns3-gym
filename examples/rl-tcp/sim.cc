@@ -83,7 +83,7 @@ int main (int argc, char *argv[])
   LogComponentEnable("OpenGymDataContainer",LOG_LEVEL_ALL);
   LogComponentEnable("OpenGymSpace",LOG_LEVEL_ALL);
   LogComponentEnable("OpenGymEnv",LOG_LEVEL_ALL);
-  LogComponentEnable("TcpL4Protocol",LOG_LEVEL_ALL);
+  // LogComponentEnable("TcpL4Protocol",LOG_LEVEL_ALL);
   uint32_t openGymPort = 5555;
   double tcpEnvTimeStep = 0.1;
 

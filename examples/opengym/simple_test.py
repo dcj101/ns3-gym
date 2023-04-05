@@ -18,8 +18,10 @@ env.reset()
 
 ob_space = env.observation_space
 ac_space = env.action_space
+mo_space = env.model_space
 print("Observation space: ", ob_space,  ob_space.dtype)
 print("Action space: ", ac_space, ac_space.dtype)
+print("Model space: ", mo_space, mo_space.dtype)
 
 stepIdx = 0
 
@@ -40,7 +42,7 @@ try:
 
         if done:
             break
-
+        
 except KeyboardInterrupt:
     print("Ctrl-C -> Exit")
 finally:

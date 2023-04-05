@@ -64,11 +64,11 @@ try:
                 if currIt + 1 < iterationNum:
                     env.reset()
                 break
-            break
+            # break
         currIt += 1
         if currIt == iterationNum:
             break
-        break
+        # break
 except KeyboardInterrupt:
     print("Ctrl-C -> Exit")
 finally:

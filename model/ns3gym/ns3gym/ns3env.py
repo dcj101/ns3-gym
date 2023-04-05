@@ -233,7 +233,9 @@ class Ns3ZmqBridge(object):
 
     #dcj
     def send_model(self, model):
+        mode = pb.EnvModelMsg()
         
+
 
     def step(self, actions):
         # exec actions for current state
