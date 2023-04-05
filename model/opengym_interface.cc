@@ -522,7 +522,12 @@ OpenGymInterface::Notify(Ptr<OpenGymEnv> entity)
   SetGetRewardCb( MakeCallback (&OpenGymEnv::GetReward, entity) );
   SetGetExtraInfoCb( MakeCallback (&OpenGymEnv::GetExtraInfo, entity) );
   SetExecuteActionsCb( MakeCallback (&OpenGymEnv::ExecuteActions, entity) );
-
+  if(m_fedLearning)
+  {
+    SetExecuteModelcb( MakeCallback (&OpenGymEnv::ExecuteModel, entity) );
+    SetGetModelCb( MakeCallback (&OpenGymEnv::GetModel, entity) );
+  }
+  
   NotifyCurrentState();
 }
 
