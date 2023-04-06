@@ -46,12 +46,10 @@ public:
   virtual bool GetGameOver() = 0;
   virtual Ptr<OpenGymDataContainer> GetObservation() = 0;
   
-  virtual Ptr<OpenGymDataContainer> GetModel();
-
   virtual float GetReward() = 0;
   virtual std::string GetExtraInfo() = 0;
   virtual bool ExecuteActions(Ptr<OpenGymDataContainer> action) = 0;
-  virtual bool ExecuteModel(Ptr<OpenGymDataContainer> model);
+  virtual Ptr<OpenGymDataContainer> ExecuteModel(Ptr<OpenGymDataContainer> model);
 
   void SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface);
   void Notify();

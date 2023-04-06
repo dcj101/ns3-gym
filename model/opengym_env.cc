@@ -77,7 +77,6 @@ OpenGymEnv::SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface)
   {
     openGymInterface->SetGetModelSpaceCb( MakeCallback (&OpenGymEnv::GetModelSpace, this) );
     openGymInterface->SetExecuteModelcb( MakeCallback(&OpenGymEnv::ExecuteModel,this) );
-    openGymInterface->SetGetModelCb( MakeCallback (&OpenGymEnv::GetModel, this) );    
   }
 
   openGymInterface->SetGetGameOverCb( MakeCallback (&OpenGymEnv::GetGameOver, this) );
@@ -122,19 +121,13 @@ OpenGymEnv::GetModelSpace()
   return box;
 }
 
-bool
-OpenGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> model)
-{
-  NS_LOG_FUNCTION(this << " nothing to do you have to override !!!");
-  return 1;
-}
-
 Ptr<OpenGymDataContainer>
-OpenGymEnv::GetModel()
+OpenGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> model)
 {
   NS_LOG_FUNCTION(this << " nothing to do you have to override !!!");
   Ptr<OpenGymBoxContainer<uint32_t> > box = CreateObject<OpenGymBoxContainer<uint32_t> >();
   return box;
 }
+
 
 }

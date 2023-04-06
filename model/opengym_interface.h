@@ -63,6 +63,7 @@ public:
 
   std::string GetExtraInfo();
   bool ExecuteActions(Ptr<OpenGymDataContainer> action);
+  Ptr<OpenGymDataContainer>  ExecuteModel(Ptr<OpenGymDataContainer> model);
 
   void SetGetActionSpaceCb(Callback< Ptr<OpenGymSpace> > cb);
   void SetGetObservationSpaceCb(Callback< Ptr<OpenGymSpace> > cb);
@@ -81,7 +82,7 @@ public:
 
   void SetExecuteActionsCb(Callback<bool, Ptr<OpenGymDataContainer> > cb);
   // 设置模型接收到的回调动作
-  void SetExecuteModelcb(Callback<bool, Ptr<OpenGymDataContainer> > cb);
+  void SetExecuteModelcb(Callback<Ptr<OpenGymDataContainer>, Ptr<OpenGymDataContainer> > cb);
 
 
   void Notify(Ptr<OpenGymEnv> entity);
@@ -115,13 +116,12 @@ private:
   Callback< bool > m_gameOverCb;
   
   Callback< Ptr<OpenGymDataContainer> > m_obsCb;
-  Callback< Ptr<OpenGymDataContainer> > m_modelgetCb;
 
   Callback<float> m_rewardCb;
   Callback<std::string> m_extraInfoCb;
   
   Callback<bool, Ptr<OpenGymDataContainer> > m_actionCb;
-  Callback<bool, Ptr<OpenGymDataContainer> > m_modelactionCb;
+  Callback<Ptr<OpenGymDataContainer>, Ptr<OpenGymDataContainer> > m_modelactionCb;
 
 };
 

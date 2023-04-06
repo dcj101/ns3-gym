@@ -207,6 +207,9 @@ class Ns3ZmqBridge(object):
 
         self.newStateRx = True
 
+    def rx_env_model(self):
+        
+
     def send_close_command(self):
         reply = pb.EnvActMsg()
         reply.stopSimReq = True
@@ -233,8 +236,19 @@ class Ns3ZmqBridge(object):
 
     #dcj
     def send_model(self, model):
-        mode = pb.EnvModelMsg()
+        reply = pb.EnvModelMsg()
         
+        ModelMsg = self._pack_data(model, self._model_space)
+        reply.ModeData.CopyFrom(ModelMsg)
+
+        reply.stopSimReq = False
+        if self.forceEnvStop:
+            reply.stopSimReq = True
+        
+        replyMsg = reply.SerializeToString()
+        self.socket.send(replyMsg)
+        self.newStateRx = False
+        return True
 
 
     def step(self, actions):

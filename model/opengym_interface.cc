@@ -161,13 +161,6 @@ OpenGymInterface::SetGetObservationCb(Callback< Ptr<OpenGymDataContainer> > cb)
   m_obsCb = cb;
 }
 
-void 
-OpenGymInterface::SetGetModelCb(Callback< Ptr<OpenGymDataContainer> > cb)
-{
-  NS_LOG_FUNCTION(this);
-  m_modelgetCb = cb;
-}
-
 void
 OpenGymInterface::SetGetRewardCb(Callback<float> cb)
 {
@@ -190,7 +183,7 @@ OpenGymInterface::SetExecuteActionsCb(Callback<bool, Ptr<OpenGymDataContainer> >
 }
 
 void 
-OpenGymInterface::SetExecuteModelcb(Callback<bool, Ptr<OpenGymDataContainer> > cb)
+OpenGymInterface::SetExecuteModelcb(Callback<Ptr<OpenGymDataContainer>, Ptr<OpenGymDataContainer> > cb)
 {
   NS_LOG_FUNCTION(this);
   m_modelactionCb = cb;
@@ -384,8 +377,9 @@ OpenGymInterface::NotifyCurrentState()
       std::exit(0);
     }
 
-    ns3opengym::DataContainer actDataContainerPbMsg = envModelMsg.modedata();
-    Ptr<OpenGymDataContainer> actDataContainer = OpenGymDataContainer::CreateFromDataContainerPbMsg(actDataContainerPbMsg);
+    ns3opengym::DataContainer modelDataContainerPbMsg = envModelMsg.modedata();
+    Ptr<OpenGymDataContainer> modelDataContainer = OpenGymDataContainer::CreateFromDataContainerPbMsg(modelDataContainerPbMsg);
+    Ptr<OpenGymDataContainer> replyModel = ExecuteModel(modelDataContainer); 
   }
   m_trainLoop += 1;
   return;
@@ -512,6 +506,18 @@ OpenGymInterface::ExecuteActions(Ptr<OpenGymDataContainer> action)
   return reply;
 }
 
+Ptr<OpenGymDataContainer>
+OpenGymInterface::ExecuteModel(Ptr<OpenGymDataContainer> model)
+{
+  NS_LOG_FUNCTION (this);
+  Ptr<OpenGymDataContainer> reply = 0;
+  if(m_modelactionCb.IsNull())
+  {
+    reply = m_modelactionCb(model);
+  }
+  return reply;
+}
+
 void
 OpenGymInterface::Notify(Ptr<OpenGymEnv> entity)
 {
@@ -525,7 +531,6 @@ OpenGymInterface::Notify(Ptr<OpenGymEnv> entity)
   if(m_fedLearning)
   {
     SetExecuteModelcb( MakeCallback (&OpenGymEnv::ExecuteModel, entity) );
-    SetGetModelCb( MakeCallback (&OpenGymEnv::GetModel, entity) );
   }
   
   NotifyCurrentState();
