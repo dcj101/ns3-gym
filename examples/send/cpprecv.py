@@ -8,17 +8,16 @@ socket.bind("tcp://*:5555")
 received_data = b''
 while True:
     data = socket.recv()
-    print(data)
-    print(len(data))
     if data == b"done":
         break
     received_data += data
 
 # 将数据转换为原始矩阵
-size = int(len(received_data) ** 0.5)
-print(size)
-print(len(received_data))
-matrix = [received_data[i:i+size] for i in range(0, len(received_data), size)]
+data_str = received_data.decode('utf-8')
+matrix_str = data_str.split(',')
+matrix_str.remove('')
+matrix = [matrix_str[i:i+3] for i in range(0, len(matrix_str), 3)]
+matrix = [[int(j) for j in i] for i in matrix]
 
 print(matrix)
 

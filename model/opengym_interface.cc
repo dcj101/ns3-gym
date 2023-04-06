@@ -302,10 +302,9 @@ OpenGymInterface::NotifyCurrentState()
   zmq::message_t request(envStateMsg.ByteSize());;
   envStateMsg.SerializeToArray(request.data(), envStateMsg.ByteSize());
   m_zmq_socket.send (request, zmq::send_flags::none);
-  NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
+
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
   NS_LOG_FUNCTION (this << "-----------------------Waiting for responed-----------------------------\n");
-  NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
  
  
@@ -347,21 +346,26 @@ OpenGymInterface::NotifyCurrentState()
   
   {
     // 使用 zmq::recv_multipart() 方法一次性读取所有帧
-    m_zmq_socket_mutipart.recv(m_zmq_socket);
-    // 创建 Protobuf 消息对象
+    // m_zmq_socket_mutipart.recv(m_zmq_socket);
+    // // 创建 Protobuf 消息对象
+    // ns3opengym::EnvModelMsg envModelMsg;
+    // // 处理消息的多个帧
+    // for (size_t i = 0; i < m_zmq_socket_mutipart.size(); ++i) 
+    // {
+    //     // 使用 frame.data() 和 frame.size() 来访问帧的数据
+    //     // 将数据追加复制到 Protobuf 消息对象中
+    //     zmq::message_t frame = m_zmq_socket_mutipart.pop();
+    //     ns3opengym::EnvModelMsg subModel;
+    //     subModel.ParseFromArray(frame.data(), frame.size());
+    //     NS_LOG_DEBUG(" Model recv =>>> " << static_cast<char*>(frame.data()) << frame.size());
+    //     envModelMsg.MergeFrom(subModel);
+    // }
+    
     ns3opengym::EnvModelMsg envModelMsg;
-    // 处理消息的多个帧
-    for (size_t i = 0; i < m_zmq_socket_mutipart.size(); ++i) 
-    {
-        // 使用 frame.data() 和 frame.size() 来访问帧的数据
-        // 将数据追加复制到 Protobuf 消息对象中
-        zmq::message_t frame = m_zmq_socket_mutipart.pop();
-        ns3opengym::EnvModelMsg subModel;
-        subModel.ParseFromArray(frame.data(), frame.size());
-        NS_LOG_DEBUG(" Model recv =>>> " << static_cast<char*>(frame.data()) << frame.size());
-        envModelMsg.MergeFrom(subModel);
-    }
-
+    zmq::message_t reply;
+    (void) m_zmq_socket.recv (reply, zmq::recv_flags::none);
+    envModelMsg.ParseFromArray(reply.data(), reply.size());
+    
     if (m_simEnd) 
     {
       return;
@@ -380,6 +384,31 @@ OpenGymInterface::NotifyCurrentState()
     ns3opengym::DataContainer modelDataContainerPbMsg = envModelMsg.modedata();
     Ptr<OpenGymDataContainer> modelDataContainer = OpenGymDataContainer::CreateFromDataContainerPbMsg(modelDataContainerPbMsg);
     Ptr<OpenGymDataContainer> replyModel = ExecuteModel(modelDataContainer); 
+    if(replyModel) 
+    {
+      // 暂时不考虑传输大模块
+      // std::string message_str = 
+      // const size_t chunk_size = 1024 * 1024;  // 1 MB
+      // const size_t message_len = message_str.size();
+
+      // for (size_t pos = 0; pos < message_len; pos += chunk_size) {
+      //     size_t chunk_len = std::min(chunk_size, message_len - pos);
+      //     zmq::message_t chunk(chunk_len);
+      //     memcpy(chunk.data(), message_str.data() + pos, chunk_len);
+      //     socket.send(chunk, pos + chunk_len < message_len ? ZMQ_SNDMORE : 0);
+      // }
+      ns3opengym::EnvModelMsg envModelMsg;
+      ns3opengym::DataContainer modeDataContainerPbMsg;
+      modeDataContainerPbMsg = replyModel->GetDataContainerPbMsg();
+      envModelMsg.mutable_modedata()->CopyFrom(obsDataContainerPbMsg);
+      zmq::message_t request(envModelMsg.ByteSize());;
+      envModelMsg.SerializeToArray(request.data(), envStateMsg.ByteSize());
+      m_zmq_socket.send (request, zmq::send_flags::none);
+    }
+    else 
+    {
+      NS_LOG_ERROR("replyModel is nullpoint!!!!");
+    }
   }
   m_trainLoop += 1;
   return;

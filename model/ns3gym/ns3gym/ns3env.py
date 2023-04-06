@@ -208,7 +208,7 @@ class Ns3ZmqBridge(object):
         self.newStateRx = True
 
     def rx_env_model(self):
-        
+
 
     def send_close_command(self):
         reply = pb.EnvActMsg()
@@ -259,7 +259,7 @@ class Ns3ZmqBridge(object):
 
     def is_game_over(self):
         return self.gameOver
-
+    #Unpack反序列化字节数组
     def _create_data(self, dataContainerPb):
         if (dataContainerPb.type == pb.Discrete):
             discreteContainerPb = pb.DiscreteDataContainer()
