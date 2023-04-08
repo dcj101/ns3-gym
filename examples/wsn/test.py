@@ -3,6 +3,10 @@
 
 import argparse
 from ns3gym import ns3env
+import time
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 __author__ = "Piotr Gawlowicz"
 __copyright__ = "Copyright (c) 2018, Technische Universität Berlin"
@@ -35,10 +39,28 @@ env = ns3env.Ns3Env(port=port, stepTime=stepTime, startSim=startSim, simSeed=see
 #env = ns3env.Ns3Env()
 env.reset()
 
+packlost = []
+packrate = []
+packedelay = []
+
 ob_space = env.observation_space
 ac_space = env.action_space
 print("Observation space: ", ob_space,  ob_space.dtype)
 print("Action space: ", ac_space, ac_space.dtype)
+
+s_size = ob_space.shape[0]
+print("State size: ",ob_space.shape[0])
+
+a_size = 3
+print("Action size: ", a_size)
+
+model = keras.Sequential()
+model.add(keras.layers.Dense(s_size, input_shape=(s_size,), activation='relu'))
+model.add(keras.layers.Dense(s_size, input_shape=(s_size,), activation='relu'))
+model.add(keras.layers.Dense(a_size, activation='softmax'))
+model.compile(optimizer=tf.train.AdamOptimizer(0.001),
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
 
 stepIdx = 0
 currIt = 0
@@ -59,6 +81,10 @@ try:
             obs, reward, done, info = env.step(action)
             print("---obs, reward, done, info: ", obs, reward, done, info)
 
+            packlost.append(obs[0])
+            packrate.append(obs[1])
+            packedelay.append(obs[2])
+
             if done:
                 stepIdx = 0
                 if currIt + 1 < iterationNum:
@@ -69,6 +95,21 @@ try:
         if currIt == iterationNum:
             break
         # break
+    print("Plot Learning Performance")
+    mpl.rcdefaults()
+    mpl.rcParams.update({'font.size': 16})
+    fig, ax = plt.subplots(figsize=(10,4))
+    plt.grid(True, linestyle='--')
+    plt.title('Learning Performance')
+    plt.plot(range(len(packlost)), packlost, label='packlost', marker="^", linestyle=":")#, color='red')
+    plt.plot(range(len(packrate)), packrate, label='packrate', marker="", linestyle="-")#, color='k')
+    plt.plot(range(len(packedelay)), packedelay, label='packedelay', marker="", linestyle="-"),# color='b')
+    # plt.plot(range(len(Rtt)),Rtt, label='Rtt', marker="", linestyle="-")#, color='y')
+    plt.xlabel('Episode')
+    plt.ylabel('Steps')
+    plt.legend(prop={'size': 12})
+    plt.savefig('learning.pdf', bbox_inches='tight')
+    plt.show() 
 except KeyboardInterrupt:
     print("Ctrl-C -> Exit")
 finally:

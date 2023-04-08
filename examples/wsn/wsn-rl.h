@@ -18,7 +18,7 @@ public:
     ~WsnRl ();
     
     uint32_t GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float Delay);
-
+    
 private:
 
     void CreateGymEnv();
