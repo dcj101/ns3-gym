@@ -20,6 +20,8 @@ WsnRl::GetTypeId (void)
                    DoubleValue (-10.0),
                    MakeDoubleAccessor (&WsnRl::m_penalty),
                    MakeDoubleChecker<double> ())
+    ;
+    return tid;
 }
 
 WsnRl::WsnRl(void)
@@ -32,8 +34,8 @@ WsnRl::~WsnRl(void)
     m_wsnRlGymEnv = 0;
 }
 
-uint16_t
-WsnRl::GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float sendRate)
+uint32_t
+WsnRl::GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float Delay)
 {
     if(!m_wsnRlGymEnv)
     {
@@ -44,7 +46,7 @@ WsnRl::GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float sendRate)
     {
         newBackoff = m_wsnRlGymEnv->GetBackoffRl(lostPacketRadio,
                                                  sendRate,
-                                                 sendRate );
+                                                 Delay );
     }
     return newBackoff;
 }

@@ -6,7 +6,7 @@ NS_LOG_COMPONENT_DEFINE ("ns3::WsnRlGymEnv");
 
 NS_OBJECT_ENSURE_REGISTERED (WsnRlGymEnv);
 
-WsnRlGymEnv::WsnRlGymEnv () : TcpGymEnv()
+WsnRlGymEnv::WsnRlGymEnv () : OpenGymEnv()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -20,8 +20,7 @@ TypeId
 WsnRlGymEnv::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::WsnRlGymEnv")
-    .SetParent<TcpGymEnv> ()
-    .SetGroupName ("OpenGym")
+    .SetParent<OpenGymEnv> ()
     .AddConstructor<WsnRlGymEnv> ()
   ;
 
@@ -69,7 +68,7 @@ WsnRlGymEnv::GetObservationSpace()
     std::vector<uint32_t> shape = {parameterNum,};
     std::string dtype = TypeNameGet<uint64_t> ();
 
-    Ptr<OpenGymBoxSpace> box = CreateObject<OpenGymBoxSpace> (low, high, shape, dtype);
+    Ptr<OpenGymBoxSpace> box = CreateObject<OpenGymBoxSpace> (low, hight, shape, dtype);
     NS_LOG_INFO ("MyGetObservationSpace: " << box);
     return box;
 }
@@ -101,6 +100,7 @@ WsnRlGymEnv::GetObservation()
     box->AddValue(m_Delay*100);
 
     NS_LOG_INFO ("MyGetObservation: " << box);
+    return box;
 }
 
 float
@@ -122,11 +122,13 @@ WsnRlGymEnv::GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float Delay)
     m_sendRate = sendRate;
     m_Delay = Delay;
     Notify();
+    return m_backoff;
 }
 
 bool 
 WsnRlGymEnv::ExecuteActions(Ptr<OpenGymDataContainer> action)
 {
+    Ptr<OpenGymBoxContainer<uint32_t> > box = DynamicCast<OpenGymBoxContainer<uint32_t> >(action);
     m_backoff = box->GetValue(0);
     NS_LOG_INFO ("MyExecuteActions: " << action);
     return true;

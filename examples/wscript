@@ -20,5 +20,7 @@ def build(bld):
     obj = bld.create_ns3_program("rl-tcp", ["core", "internet",'applications','flow-monitor',"point-to-point",'point-to-point-layout', "opengym"])
     obj.source = ["rl-tcp/sim.cc", "rl-tcp/tcp-rl-env.cc", "rl-tcp/tcp-rl.cc"]
 
+    obj = bld.create_ns3_program("rl-wsn", ["wsn","opengym"])
+    obj.source = ["wsn/sim.cc","wsn/wsn-rl-env.cc","wsn/wsn-rl.cc"]
     
     

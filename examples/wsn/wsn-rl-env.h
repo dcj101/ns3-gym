@@ -2,12 +2,13 @@
 #define WSN_RL_ENV_H
 
 #include "ns3/opengym-module.h"
+#include "ns3/double.h"
 #include <vector>
 
 namespace ns3
 {
 
-class WsnRlGymEnv : public OpenGym
+class WsnRlGymEnv : public OpenGymEnv
 {
 public:
     WsnRlGymEnv ();

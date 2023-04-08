@@ -1,8 +1,9 @@
 #ifndef WSN_RL_H
 #define WSN_RL_H
 
-#include "ns3/lr-wpan-csmaca.h"
 #include "ns3/opengym-module.h"
+#include "wsn-rl-env.h"
+#include "ns3/double.h"
 
 namespace ns3
 {
