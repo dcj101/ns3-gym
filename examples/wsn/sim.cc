@@ -42,24 +42,28 @@ int main()
     // LogComponentEnable ("LrWpanPhy", LOG_LEVEL_ALL);
     // LogComponentEnable ("LrWpanCsmaCa", LOG_LEVEL_ALL);
     // LogComponentEnable ("LrWpanNetDevice", LOG_LEVEL_ALL);
-    // LogComponentEnable ("WsnNwkProtocol", LOG_LEVEL_ALL);
+    LogComponentEnable ("WsnNwkProtocol", LOG_LEVEL_ALL);
     // LogComponentEnable ("NwkHeader", LOG_LEVEL_ALL);
     // LogComponentEnable ("WsnAddressAllocator", LOG_LEVEL_ALL);
     // LogComponentEnable ("Node", LOG_LEVEL_ALL);
-    LogComponentEnable("OpenGymInterface",LOG_LEVEL_ALL);
-    LogComponentEnable("OpenGymDataContainer",LOG_LEVEL_ALL);
-    LogComponentEnable("OpenGymSpace",LOG_LEVEL_ALL);
-    LogComponentEnable("OpenGymEnv",LOG_LEVEL_ALL);
-    LogComponentEnable ("LrWpanCsmaCa", LOG_LEVEL_ALL);
-    LogComponentEnable ("ns3::WsnRlGymEnv", LOG_LEVEL_ALL);
+    // LogComponentEnable("OpenGymInterface",LOG_LEVEL_ALL);
+    // LogComponentEnable("OpenGymDataContainer",LOG_LEVEL_ALL);
+    // LogComponentEnable("OpenGymSpace",LOG_LEVEL_ALL);
+    // LogComponentEnable("OpenGymEnv",LOG_LEVEL_ALL);
+    // LogComponentEnable ("LrWpanCsmaCa", LOG_LEVEL_ALL);
+    // LogComponentEnable ("ns3::WsnRlGymEnv", LOG_LEVEL_ALL);
 
     uint32_t openGymPort = 5555;
-    Config::SetDefault ("ns3::WsnRl::Reward", DoubleValue (2.0)); // Reward when increasing congestion window
-    Config::SetDefault ("ns3::WsnRl::Penalty", DoubleValue (-30.0)); // Penalty when decreasing
     // OpenGym Env --- has to be created before any other thing
     Ptr<OpenGymInterface> openGymInterface = CreateObject<OpenGymInterface> (openGymPort);
     Ptr<WsnRlGymEnv> myGymEnv = CreateObject<WsnRlGymEnv> ();
     myGymEnv->SetOpenGymInterface(openGymInterface);
+
+    uint32_t openGymPort1 = 5556;
+    // OpenGym Env --- has to be created before any other thing
+    Ptr<OpenGymInterface> openGymInterface1 = CreateObject<OpenGymInterface> (openGymPort1);
+    Ptr<WsnRlGymEnv> myGymEnv1 = CreateObject<WsnRlGymEnv> ();
+    myGymEnv1->SetOpenGymInterface(openGymInterface1);
 
     // 设置入网分配器的分配规则
     WsnAddressAllocator::Get ()->SetWsnAddressAllocator(5,3,3);
@@ -184,6 +188,7 @@ int main()
     Ptr<ConstantPositionMobilityModel> sender3Mobility = CreateObject<ConstantPositionMobilityModel> ();
     sender3Mobility->SetPosition (Vector (0,0,10)); //10 m distance
     dev3->GetPhy ()->SetMobility (sender3Mobility);
+    dev3->GetCsmaCa ()->SetLrWpanNwkBackOffRl(MakeCallback(&WsnRlGymEnv::GetBackoffRl,myGymEnv1));
 
     
     Ptr<ConstantPositionMobilityModel> sender4Mobility = CreateObject<ConstantPositionMobilityModel> ();
@@ -200,22 +205,22 @@ int main()
     Simulator::Schedule(Seconds(0.0),&WsnNwkProtocol::JoinRequest,
                         nwk0,nwk1);
     // nwk0->JoinRequest(NODE_TYPE::COOR,NULL);
-    Simulator::Schedule(Seconds(5.0),&WsnNwkProtocol::JoinRequest,
+    Simulator::Schedule(Seconds(25.0),&WsnNwkProtocol::JoinRequest,
                         nwk3,nwk0);
     // // nwk1->JoinRequest(NODE_TYPE::EDGE,nwk1);
 
-    Simulator::Schedule(Seconds(10.0),&WsnNwkProtocol::JoinRequest,
+    Simulator::Schedule(Seconds(50.0),&WsnNwkProtocol::JoinRequest,
                         nwk1,nwk0);
 
-    Simulator::Schedule(Seconds(15.0),&WsnNwkProtocol::JoinRequest,
+    Simulator::Schedule(Seconds(75.0),&WsnNwkProtocol::JoinRequest,
                         nwk2,nwk3);
 
-    Simulator::Schedule(Seconds(20.0),&WsnNwkProtocol::JoinRequest,
+    Simulator::Schedule(Seconds(100.0),&WsnNwkProtocol::JoinRequest,
                         nwk4,nwk3);        
 
-    double sendtime = 22;
+    double sendtime = 225;
 
-    for(int i = 0; i < 5500; i+=6)
+    for(int i = 0; i < 7500; i+=6)
     { 
         Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable> ();;
         double delay = uniformRandomVariable->GetValue (0, 0.1);
@@ -231,7 +236,7 @@ int main()
 
     bool TraceMetric = 1;
 
-    Simulator::Stop(Seconds(12000));
+    Simulator::Stop(Seconds(25000));
     Simulator::Run ();
 
     uint32_t SentPackets = 0;

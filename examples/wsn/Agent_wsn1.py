@@ -33,7 +33,7 @@ args = parser.parse_args()
 startSim = bool(args.start)
 iterationNum = int(args.iterations)
 
-port = 5555
+port = 5556
 simTime = 10 # seconds
 stepTime = 0.5  # seconds
 seed = 12
@@ -90,7 +90,7 @@ model.compile(optimizer=tf.train.AdamOptimizer(0.001),
               metrics=['accuracy'])
 
 total_episodes = 16
-max_env_steps = 1000
+max_env_steps = 5500
 env._max_episode_steps = max_env_steps
 
 epsilon = 1              # exploration rate
