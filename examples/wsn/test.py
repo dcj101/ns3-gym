@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import argparse
-from ns3gym import ns3env
-import time
+import gym
+import tensorflow as tf
+import tensorflow.contrib.slim as slim
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+# from tensorflow import keras
+from ns3gym import ns3env
+import time
+import argparse
+
 
 __author__ = "Piotr Gawlowicz"
 __copyright__ = "Copyright (c) 2018, Technische Universität Berlin"
@@ -44,23 +49,9 @@ packrate = []
 packedelay = []
 
 ob_space = env.observation_space
-ac_space = env.action_space
+ac_space = env.action_space 
 print("Observation space: ", ob_space,  ob_space.dtype)
 print("Action space: ", ac_space, ac_space.dtype)
-
-s_size = ob_space.shape[0]
-print("State size: ",ob_space.shape[0])
-
-a_size = 3
-print("Action size: ", a_size)
-
-model = keras.Sequential()
-model.add(keras.layers.Dense(s_size, input_shape=(s_size,), activation='relu'))
-model.add(keras.layers.Dense(s_size, input_shape=(s_size,), activation='relu'))
-model.add(keras.layers.Dense(a_size, activation='softmax'))
-model.compile(optimizer=tf.train.AdamOptimizer(0.001),
-              loss='categorical_crossentropy',
-              metrics=['accuracy'])
 
 stepIdx = 0
 currIt = 0

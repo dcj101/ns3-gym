@@ -51,7 +51,7 @@ int main()
     LogComponentEnable("OpenGymSpace",LOG_LEVEL_ALL);
     LogComponentEnable("OpenGymEnv",LOG_LEVEL_ALL);
     LogComponentEnable ("LrWpanCsmaCa", LOG_LEVEL_ALL);
-    // LogComponentEnable ("ns3::WsnRlGymEnv", LOG_LEVEL_ALL);
+    LogComponentEnable ("ns3::WsnRlGymEnv", LOG_LEVEL_ALL);
 
     uint32_t openGymPort = 5555;
     Config::SetDefault ("ns3::WsnRl::Reward", DoubleValue (2.0)); // Reward when increasing congestion window
@@ -215,7 +215,7 @@ int main()
 
     double sendtime = 22;
 
-    for(int i = 0; i < 1500; i+=6)
+    for(int i = 0; i < 5500; i+=6)
     { 
         Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable> ();;
         double delay = uniformRandomVariable->GetValue (0, 0.1);
@@ -231,7 +231,7 @@ int main()
 
     bool TraceMetric = 1;
 
-    Simulator::Stop(Seconds(2000));
+    Simulator::Stop(Seconds(12000));
     Simulator::Run ();
 
     uint32_t SentPackets = 0;

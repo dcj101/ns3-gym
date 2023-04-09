@@ -121,6 +121,7 @@ WsnRlGymEnv::GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float Delay)
     m_lostPacketRadio = lostPacketRadio;
     m_sendRate = sendRate;
     m_Delay = Delay;
+    NS_LOG_FUNCTION(this << lostPacketRadio << " " << sendRate << " " << Delay);
     Notify();
     return m_backoff;
 }

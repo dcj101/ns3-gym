@@ -93,7 +93,7 @@ total_episodes = 16
 max_env_steps = 1000
 env._max_episode_steps = max_env_steps
 
-epsilon = 0.5               # exploration rate
+epsilon = 1               # exploration rate
 epsilon_min = 0.01
 epsilon_decay = 0.999
 
@@ -144,6 +144,7 @@ for e in range(total_episodes):
         # 同时0.7的系数是为了调节两个特征的权重，使得它们在评估中的贡献相对平衡。
         U_new=0.7*(np.log(obs[0,2]))-0.7*(np.log(obs[0,9] ))
         U=U_new-U_old
+        print("U is :", U)
         # 如果网络状态变差了 reward=-5 误差范围是0.05
         if U <-0.05:
             reward=-5
@@ -152,11 +153,12 @@ for e in range(total_episodes):
         else:
             reward=0
         # 执行下一步动作
+        print("reward:::",reward)
         next_state, reward, done, info = env.step(actions)
         # 获取当前环境的拥塞窗口大小
         cWnd = next_state[5]
         print("cWnd:",cWnd)
-
+        print("reward:",reward)
         if done:
             print("episode: {}/{}, time: {}, rew: {}, eps: {:.2}"
                   .format(e, total_episodes, time, rewardsum, epsilon))
