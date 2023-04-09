@@ -26,8 +26,6 @@
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 
-const int SendModel = 10;
-
 namespace ns3 {
 
 class OpenGymSpace;
@@ -97,8 +95,6 @@ private:
   static void Delete (void);
 
   
-
-  uint32_t m_trainLoop;
   uint32_t m_port;
   zmq::context_t m_zmq_context;
   zmq::socket_t m_zmq_socket;

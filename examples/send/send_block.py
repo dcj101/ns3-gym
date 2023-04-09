@@ -20,7 +20,7 @@ for row in matrix:
     for chunk in chunks:
         socket.send_string(','.join(map(str, chunk)))
         print(','.join(map(str, chunk)))
-        time.sleep(0.001)
+        time.sleep(0.1)
 
 # 发送结束标志
 socket.send_string("done")

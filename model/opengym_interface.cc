@@ -95,14 +95,14 @@ OpenGymInterface::Delete (void)
 }
 
 OpenGymInterface::OpenGymInterface(uint32_t port):
-  m_trainLoop(10), m_port(port), m_zmq_context(1), m_zmq_socket(m_zmq_context, ZMQ_REQ),m_zmq_socket_mutipart(),
+   m_port(port), m_zmq_context(1), m_zmq_socket(m_zmq_context, ZMQ_REQ),m_zmq_socket_mutipart(),
   m_simEnd(false), m_stopEnvRequested(false), m_initSimMsgSent(false), m_fedLearning(false)
 {
   NS_LOG_FUNCTION (this);
 }
 
 OpenGymInterface::OpenGymInterface(bool isFedLearning, uint32_t port):
-  m_trainLoop(10), m_port(port), m_zmq_context(1), m_zmq_socket(m_zmq_context, ZMQ_REQ),m_zmq_socket_mutipart(),
+   m_port(port), m_zmq_context(1), m_zmq_socket(m_zmq_context, ZMQ_REQ),m_zmq_socket_mutipart(),
   m_simEnd(false), m_stopEnvRequested(false), m_initSimMsgSent(false), m_fedLearning(isFedLearning)
 {
   NS_LOG_FUNCTION (this);
@@ -268,6 +268,11 @@ OpenGymInterface::NotifyCurrentState()
     return;
   }
 
+  if(GetExtraInfo() == "RecvModel")
+  {
+    Ptr<OpenGymDataContainer> m_modelBox = 
+  }
+  
   // collect current env state
   Ptr<OpenGymDataContainer> obsDataContainer = GetObservation();
   float reward = GetReward();
@@ -311,7 +316,7 @@ OpenGymInterface::NotifyCurrentState()
   // 如果不是SendModel整数倍的话，就是py那边反馈还是action
  
  
-  if(!m_fedLearning || m_trainLoop % SendModel) 
+  if(!m_fedLearning) 
   {
     // receive act msg form python
     ns3opengym::EnvActMsg envActMsg;

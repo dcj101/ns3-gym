@@ -1,4 +1,5 @@
 #include "wsn-rl-env.h"
+#include <ns3/simulator.h>
 
 namespace ns3
 {
@@ -23,7 +24,6 @@ WsnRlGymEnv::GetTypeId (void)
     .SetParent<OpenGymEnv> ()
     .AddConstructor<WsnRlGymEnv> ()
   ;
-
   return tid;
 }
 
@@ -73,6 +73,21 @@ WsnRlGymEnv::GetObservationSpace()
     return box;
 }
 
+
+Ptr<OpenGymSpace> 
+WsnRlGymEnv::GetModelSpace()
+{
+    uint32_t parameterNum = 200;
+    float low = 0.0;
+    float hight = 1000000.0;
+    std::vector<uint32_t> shape = {parameterNum,};
+    std::string dtype = TypeNameGet<uint64_t> ();
+
+    Ptr<OpenGymBoxSpace> box = CreateObject<OpenGymBoxSpace> (low, hight, shape, dtype);
+    NS_LOG_INFO ("MyGetObservationSpace: " << box);
+    return box;
+}
+
 bool
 WsnRlGymEnv::GetGameOver()
 {
@@ -103,6 +118,7 @@ WsnRlGymEnv::GetObservation()
     return box;
 }
 
+
 float
 WsnRlGymEnv::GetReward()
 {
@@ -121,16 +137,58 @@ WsnRlGymEnv::GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float Delay)
     m_lostPacketRadio = lostPacketRadio;
     m_sendRate = sendRate;
     m_Delay = Delay;
+    if(isFedLearning)
+    {
+        return -1;    
+    }
     NS_LOG_FUNCTION(this << lostPacketRadio << " " << sendRate << " " << Delay);
+    isTraining = true;
     Notify();
+    isTraining = false;
     return m_backoff;
 }
+
+std::vector<uint32_t> 
+WsnRlGymEnv::GetMyModel()
+{
+    m_info = "GetModel";
+    if(isTraining)
+    {
+        std::vector<uint32_t> temp(2);
+        return temp;
+    }
+    isFedLearning = true;
+    Notify();
+    return m_model;
+}
+
+void 
+WsnRlGymEnv::RecvModel(std::vector<uint32_t> mode)
+{
+    m_info = "RecvModel";
+    
+}
+
+
+
 
 bool 
 WsnRlGymEnv::ExecuteActions(Ptr<OpenGymDataContainer> action)
 {
     Ptr<OpenGymBoxContainer<uint32_t> > box = DynamicCast<OpenGymBoxContainer<uint32_t> >(action);
     m_backoff = box->GetValue(0);
+    NS_LOG_INFO ("MyExecuteActions: " << action);
+    return true;
+}
+
+Ptr<OpenGymDataContainer> 
+WsnRlGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> action)
+{
+    Ptr<OpenGymBoxContainer<uint32_t> > box = DynamicCast<OpenGymBoxContainer<uint32_t> >(action);
+    for(int i = 0 ; i < 200; ++ i)
+    {
+        m_model.push_back(box->GetValue(i));
+    }
     NS_LOG_INFO ("MyExecuteActions: " << action);
     return true;
 }

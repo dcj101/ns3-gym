@@ -20,9 +20,12 @@ public:
     void SetPenalty(float value);
 
     uint32_t GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float Delay);
+    std::vector<uint32_t> GetMyModel();
+    void RecvModel(std::vector<uint32_t> mode);
 
     virtual Ptr<OpenGymSpace> GetActionSpace();
     virtual Ptr<OpenGymSpace> GetObservationSpace();
+    virtual Ptr<OpenGymSpace> GetModelSpace();
     // virtual Ptr<OpenGymSpace> GetModelSpace();
     // TODO:  get all in one function like below, do we need it?
     //virtual void GetEnvState(Ptr<OpenGymDataContainer>  &obs, float &reward, bool &done, std::string &info);
@@ -32,6 +35,7 @@ public:
     virtual float GetReward();
     virtual std::string GetExtraInfo();
     virtual bool ExecuteActions(Ptr<OpenGymDataContainer> action);
+    virtual Ptr<OpenGymDataContainer> ExecuteModel(Ptr<OpenGymDataContainer> model);
     // virtual Ptr<OpenGymDataContainer> ExecuteModel(Ptr<OpenGymDataContainer> model);
 
     // void SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface);
@@ -56,6 +60,11 @@ public:
 
     uint32_t m_backoff;
 
+    std::vector<uint32_t> m_model;
+
+    bool isFedlearning;
+
+    bool isTraining;
 };
 
 }

@@ -130,6 +130,8 @@ for e in range(total_episodes):
         actions = [action_mapping[action_index]]
 
         next_state, reward, done, info = env.step(actions)
+
+        
         print(next_state,reward,done,info)
         if done:
             print("episode: {}/{}, time: {}, rew: {}, eps: {:.2}"
