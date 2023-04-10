@@ -333,7 +333,7 @@ OpenGymInterface::NotifyCurrentState()
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
  
 
- 
+  NS_LOG_FUNCTION (this << " m_f " << m_fedLearning << " extrainfo " << GetExtraInfo());
   if(!m_fedLearning || GetExtraInfo() == "Training") 
   {
     // receive act msg form python
@@ -362,7 +362,6 @@ OpenGymInterface::NotifyCurrentState()
     ns3opengym::DataContainer actDataContainerPbMsg = envActMsg.actdata();
     Ptr<OpenGymDataContainer> actDataContainer = OpenGymDataContainer::CreateFromDataContainerPbMsg(actDataContainerPbMsg);
     ExecuteActions(actDataContainer);
-    
   } 
   else if(GetExtraInfo() == "GetModel")
   {
@@ -450,7 +449,7 @@ void
 OpenGymInterface::SetIsFedLearning(bool isFedLearning)
 {
   NS_LOG_FUNCTION(this);
-  isFedLearning = m_fedLearning;
+  m_fedLearning = isFedLearning;
 }
 
 Ptr<OpenGymSpace>

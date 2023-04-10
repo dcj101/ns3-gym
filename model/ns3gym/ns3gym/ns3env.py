@@ -80,6 +80,7 @@ class Ns3ZmqBridge(object):
         self.gameOverReason = None
         self.extraInfo = None
         self.newStateRx = False
+        self.newModelRx = False
 
     def close(self):
         try:
@@ -207,6 +208,11 @@ class Ns3ZmqBridge(object):
 
         self.newStateRx = True
 
+    def rx_model_(self):
+        if self.newModelRx == True:
+            return
+        
+        self.newModelRx = False 
 
     def send_close_command(self):
         reply = pb.EnvActMsg()
@@ -215,6 +221,7 @@ class Ns3ZmqBridge(object):
         replyMsg = reply.SerializeToString()
         self.socket.send(replyMsg)
         self.newStateRx = False
+        self.newModelRx = False
         return True
 
     def send_actions(self, actions):
@@ -243,9 +250,9 @@ class Ns3ZmqBridge(object):
         if self.forceEnvStop:
             reply.stopSimReq = True
         
-        replyMsg = reply.SerializeToString()
-        self.socket.send(replyMsg)
-        self.newStateRx = False
+        ModelMsg = reply.SerializeToString()
+        self.socket.send(ModelMsg)
+        self.newModelRx = False
         return True
 
 
@@ -429,8 +436,9 @@ class Ns3Env(gym.Env):
         self.envDirty = True
         return self.get_state()
     
-    def send_model(slef,model):
+    def send_model(self,model):
         self.ns3ZmqBridge.send_model_(model)
+
 
     def reset(self):
         if not self.envDirty:

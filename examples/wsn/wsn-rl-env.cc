@@ -81,7 +81,7 @@ WsnRlGymEnv::GetModelSpace()
     float low = 0.0;
     float hight = 1000000.0;
     std::vector<uint32_t> shape = {parameterNum,};
-    std::string dtype = TypeNameGet<uint64_t> ();
+    std::string dtype = TypeNameGet<double> ();
 
     Ptr<OpenGymBoxSpace> box = CreateObject<OpenGymBoxSpace> (low, hight, shape, dtype);
     NS_LOG_INFO ("MyGetObservationSpace: " << box);
@@ -152,12 +152,12 @@ WsnRlGymEnv::GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float Delay)
 std::vector<double> 
 WsnRlGymEnv::GetMyModel()
 {
-    m_info = "GetModel";
     if(isTraining)
     {
         return std::vector<double>();
     }
     isFedlearning = true;
+    m_info = "GetModel";
     Notify();
     return m_model;
 }

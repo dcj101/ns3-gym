@@ -118,7 +118,7 @@ for e in range(total_episodes):
     obs = env.reset()
     obs = np.reshape(obs, [1, s_size])
     rewardsum = 0
-    for time in range(max_env_steps):
+    for mytime in range(max_env_steps):
         # Choose action
         if np.random.rand(1) < epsilon:
             action_index = np.random.randint(a_size)
@@ -130,14 +130,16 @@ for e in range(total_episodes):
         actions = [action_mapping[action_index]]
 
         next_state, reward, done, info = env.step(actions)
+        print(next_state,reward,done,info)
 
         if info == "GetModel" :
-            output_layer_weights = model.layers[-1].get_weights()[0]
-            env.send_model(output_layer_weights)
-            time.sleep(10)
-            break
+            weights = model.get_weights()   
+            for i, layer_weights in enumerate(weights):
+                print("Layer {} weights shape: {}".format(i, layer_weights.shape))
+                if i == 5:
+                    isSend = env.send_model(layer_weights)
+                    break
         
-        print(next_state,reward,done,info)
         if done:
             print("episode: {}/{}, time: {}, rew: {}, eps: {:.2}"
                   .format(e, total_episodes, time, rewardsum, epsilon))
@@ -217,7 +219,7 @@ for e in range(total_episodes):
     fig, ax = plt.subplots(figsize=(10,4))
     plt.grid(True, linestyle='--')
     plt.title('Learning Performance')
-    gap = 250
+    gap = 1
     plt.plot(range(0, len(packlost), gap), packlost[::gap], label='packlost', marker="^", linestyle=":")
     plt.plot(range(0, len(packrate), gap), packrate[::gap], label='packrate', marker="", linestyle="-")
     plt.plot(range(0, len(packedelay), gap), packedelay[::gap], label='packedelay', marker="", linestyle="-"),

@@ -46,23 +46,25 @@ int main()
     // LogComponentEnable ("NwkHeader", LOG_LEVEL_ALL);
     // LogComponentEnable ("WsnAddressAllocator", LOG_LEVEL_ALL);
     // LogComponentEnable ("Node", LOG_LEVEL_ALL);
-    // LogComponentEnable("OpenGymInterface",LOG_LEVEL_ALL);
+    LogComponentEnable("OpenGymInterface",LOG_LEVEL_ALL);
     // LogComponentEnable("OpenGymDataContainer",LOG_LEVEL_ALL);
     // LogComponentEnable("OpenGymSpace",LOG_LEVEL_ALL);
     // LogComponentEnable("OpenGymEnv",LOG_LEVEL_ALL);
     // LogComponentEnable ("LrWpanCsmaCa", LOG_LEVEL_ALL);
-    // LogComponentEnable ("ns3::WsnRlGymEnv", LOG_LEVEL_ALL);
+    LogComponentEnable ("ns3::WsnRlGymEnv", LOG_LEVEL_ALL);
 
     uint32_t openGymPort = 5555;
     // OpenGym Env --- has to be created before any other thing
     Ptr<OpenGymInterface> openGymInterface = CreateObject<OpenGymInterface> (openGymPort);
     Ptr<WsnRlGymEnv> myGymEnv = CreateObject<WsnRlGymEnv> ();
+    myGymEnv->SetIsFedLearning(1);
     myGymEnv->SetOpenGymInterface(openGymInterface);
-
+    
     uint32_t openGymPort1 = 5556;
     // OpenGym Env --- has to be created before any other thing
     Ptr<OpenGymInterface> openGymInterface1 = CreateObject<OpenGymInterface> (openGymPort1);
     Ptr<WsnRlGymEnv> myGymEnv1 = CreateObject<WsnRlGymEnv> ();
+    myGymEnv1->SetIsFedLearning(1);
     myGymEnv1->SetOpenGymInterface(openGymInterface1);
 
     // 设置入网分配器的分配规则
@@ -223,7 +225,7 @@ int main()
     double sendtime = 225;
     Simulator::Schedule(Seconds(sendtime+5),&WsnNwkProtocol::GetModel,nwk2);
     Simulator::Schedule(Seconds(sendtime+5),&WsnNwkProtocol::GetModel,nwk3);
-    for(int i = 0; i < 1000; i+=6)
+    for(int i = 0; i < 5000; i+=6)
     { 
         Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable> ();;
         double delay = uniformRandomVariable->GetValue (0, 0.1);
