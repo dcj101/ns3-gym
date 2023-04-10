@@ -47,10 +47,11 @@ env.reset()
 
 ob_space = env.observation_space
 ac_space = env.action_space
+mo_space = env.model_space
 
 print("Observation space: ", ob_space,  ob_space.dtype)
 print("Action space: ", ac_space, ac_space.dtype)
-
+print("Model space: ", mo_space, mo_space.dtype)
 
 # def get_agent(obs):
 #     print("hello IIIIIIIIIIIIIIIIIIII")
@@ -139,6 +140,7 @@ for e in range(total_episodes):
                 if i == 5:
                     isSend = env.send_model(layer_weights.tolist())
                     print(layer_weights)
+                    print("marge : ",isSend)
                     RecvModel = False
                     while 1:
                         RecvModel = False

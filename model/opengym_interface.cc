@@ -267,18 +267,23 @@ void
 OpenGymInterface::NotifyCurrentState()
 {
   NS_LOG_FUNCTION (this);
-  if (!m_initSimMsgSent) {
+  if (!m_initSimMsgSent) 
+  {
     Init();
   }
 
-  if (m_stopEnvRequested) {
+  if (m_stopEnvRequested) 
+  {
     return;
   }
-
+  if (m_simEnd) 
+  {
+    return;
+  }
   if(GetExtraInfo() == "RecvModel")
   {
 
-    Ptr<OpenGymBoxContainer<double>> m_modelBox = CreateObject<OpenGymBoxContainer<double> >();
+    Ptr<OpenGymBoxContainer<float>> m_modelBox = CreateObject<OpenGymBoxContainer<float> >();
     for(auto it : m_model)
     {
       m_modelBox->AddValue(it);

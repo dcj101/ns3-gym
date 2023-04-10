@@ -75,6 +75,7 @@ class Ns3ZmqBridge(object):
 
         self.forceEnvStop = False
         self.obsData = None
+        self.modelData = None
         self.reward = 0
         self.gameOver = False
         self.gameOverReason = None
@@ -208,12 +209,20 @@ class Ns3ZmqBridge(object):
 
         self.newStateRx = True
 
-    def rx_model_(self):
+    def rx_model_state(self):
         if self.newModelRx == True:
             return
-        
-        self.newModelRx = False 
+        request = self.socket.recv()
 
+        modelStateMsg = pb.EnvModelMsg()
+
+        modelStateMsg.ParseFromString(request)
+
+        self.modelData = self._create_data(modelStateMsg.ModeData)
+
+        self.newModelRx = True 
+        return
+    
     def send_close_command(self):
         reply = pb.EnvActMsg()
         reply.stopSimReq = True
@@ -315,6 +324,9 @@ class Ns3ZmqBridge(object):
 
     def get_obs(self):
         return self.obsData
+
+    def get_model(self):
+        return self.modelData
 
     def get_reward(self):
         return self.reward
@@ -438,7 +450,8 @@ class Ns3Env(gym.Env):
     
     def send_model(self,model):
         self.ns3ZmqBridge.send_model_(model)
-
+        self.ns3ZmqBridge.rx_model_state()
+        return self.ns3ZmqBridge.get_model()
 
     def reset(self):
         if not self.envDirty:

@@ -40,7 +40,6 @@ int main()
     // LogComponentEnable ("LrWpanMac", LOG_LEVEL_ALL);
     // LogComponentEnable ("WsnFlowProbe", LOG_LEVEL_ALL);
     // LogComponentEnable ("LrWpanPhy", LOG_LEVEL_ALL);
-    LogComponentEnable ("LrWpanCsmaCa", LOG_LEVEL_ALL);
     // LogComponentEnable ("LrWpanNetDevice", LOG_LEVEL_ALL);
     LogComponentEnable ("WsnNwkProtocol", LOG_LEVEL_ALL);
     // LogComponentEnable ("NwkHeader", LOG_LEVEL_ALL);
@@ -50,8 +49,8 @@ int main()
     // LogComponentEnable("OpenGymDataContainer",LOG_LEVEL_ALL);
     // LogComponentEnable("OpenGymSpace",LOG_LEVEL_ALL);
     // LogComponentEnable("OpenGymEnv",LOG_LEVEL_ALL);
-    LogComponentEnable ("LrWpanCsmaCa", LOG_LEVEL_ALL);
-    // LogComponentEnable ("ns3::WsnRlGymEnv", LOG_LEVEL_ALL);
+    // LogComponentEnable ("LrWpanCsmaCa", LOG_LEVEL_ALL);
+    LogComponentEnable ("ns3::WsnRlGymEnv", LOG_LEVEL_ALL);
 
     uint32_t openGymPort = 5555;
     // OpenGym Env --- has to be created before any other thing
@@ -224,18 +223,18 @@ int main()
 
     double sendtime = 225;
     Simulator::Schedule(Seconds(sendtime+5),&WsnNwkProtocol::GetModel,nwk2);
-    // Simulator::Schedule(Seconds(sendtime+5),&WsnNwkProtocol::GetModel,nwk3);
-    // for(int i = 0; i < 10; i+=6)
-    // { 
-    //     Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable> ();;
-    //     double delay = uniformRandomVariable->GetValue (10, 100);
-    //     Simulator::Schedule(Seconds(sendtime+(i+0)*delay),&Test,nwk2,nwk1);
-    //     Simulator::Schedule(Seconds(sendtime+(i+1)*delay),&Test,nwk1,nwk2);
-    //     Simulator::Schedule(Seconds(sendtime+(i+2)*delay),&Test,nwk4,nwk1);
-    //     Simulator::Schedule(Seconds(sendtime+(i+3)*delay),&Test,nwk1,nwk4);
-    //     Simulator::Schedule(Seconds(sendtime+(i+4)*delay),&Test,nwk2,nwk4);    
-    //     Simulator::Schedule(Seconds(sendtime+(i+5)*delay),&Test,nwk4,nwk2);
-    // }
+    Simulator::Schedule(Seconds(sendtime+5),&WsnNwkProtocol::GetModel,nwk3);
+    for(int i = 0; i < 20; i+=6)
+    { 
+        Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable> ();;
+        double delay = uniformRandomVariable->GetValue (10, 100);
+        Simulator::Schedule(Seconds(sendtime+(i+0)*delay),&Test,nwk2,nwk1);
+        Simulator::Schedule(Seconds(sendtime+(i+1)*delay),&Test,nwk1,nwk2);
+        Simulator::Schedule(Seconds(sendtime+(i+2)*delay),&Test,nwk4,nwk1);
+        Simulator::Schedule(Seconds(sendtime+(i+3)*delay),&Test,nwk1,nwk4);
+        Simulator::Schedule(Seconds(sendtime+(i+4)*delay),&Test,nwk2,nwk4);    
+        Simulator::Schedule(Seconds(sendtime+(i+5)*delay),&Test,nwk4,nwk2);
+    }
 
 
 

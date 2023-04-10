@@ -140,6 +140,7 @@ for e in range(total_episodes):
                 if i == 5:
                     isSend = env.send_model(layer_weights.tolist())
                     print(layer_weights)
+                    print("marge : ",isSend)
                     RecvModel = False
                     while 1:
                         RecvModel = False
