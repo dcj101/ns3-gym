@@ -72,7 +72,8 @@ OpenGymEnv::SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface)
   m_openGymInterface = openGymInterface;
   openGymInterface->SetGetActionSpaceCb( MakeCallback (&OpenGymEnv::GetActionSpace, this) );
   openGymInterface->SetGetObservationSpaceCb( MakeCallback (&OpenGymEnv::GetObservationSpace, this) );
-  
+  openGymInterface->SetIsFedLearning(m_isFedLearning);
+
   if(openGymInterface->IsFedLearning())
   {
     openGymInterface->SetGetModelSpaceCb( MakeCallback (&OpenGymEnv::GetModelSpace, this) );
@@ -84,8 +85,7 @@ OpenGymEnv::SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface)
   openGymInterface->SetGetRewardCb( MakeCallback (&OpenGymEnv::GetReward, this) );
   openGymInterface->SetGetExtraInfoCb( MakeCallback (&OpenGymEnv::GetExtraInfo, this) );
   openGymInterface->SetExecuteActionsCb( MakeCallback (&OpenGymEnv::ExecuteActions, this) );
-  
-  
+
 }
 
 void
@@ -121,13 +121,38 @@ OpenGymEnv::GetModelSpace()
   return box;
 }
 
-Ptr<OpenGymDataContainer>
+void
 OpenGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> model)
 {
   NS_LOG_FUNCTION(this << " nothing to do you have to override !!!");
-  Ptr<OpenGymBoxContainer<uint32_t> > box = CreateObject<OpenGymBoxContainer<uint32_t> >();
-  return box;
+  return;
 }
+
+void 
+OpenGymEnv::RecvModel(std::vector<double> model)
+{
+  if(m_openGymInterface)
+  {
+    m_openGymInterface->RecvModel(model);
+  } 
+  else
+  {
+    NS_LOG_FUNCTION(this << "m_openGymInterface is zero point !!");
+  }
+}
+
+bool 
+OpenGymEnv::GetIsFedLearning()
+{
+  return m_isFedLearning;
+}
+
+void
+OpenGymEnv::SetIsFedLearning(bool isFedLearning)
+{
+  m_isFedLearning = isFedLearning;
+}
+
 
 
 }

@@ -20,8 +20,8 @@ public:
     void SetPenalty(float value);
 
     uint32_t GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float Delay);
-    std::vector<uint32_t> GetMyModel();
-    void RecvModel(std::vector<uint32_t> mode);
+    std::vector<double> GetMyModel();
+    virtual void RecvModel(std::vector<double> mode);
 
     virtual Ptr<OpenGymSpace> GetActionSpace();
     virtual Ptr<OpenGymSpace> GetObservationSpace();
@@ -35,7 +35,7 @@ public:
     virtual float GetReward();
     virtual std::string GetExtraInfo();
     virtual bool ExecuteActions(Ptr<OpenGymDataContainer> action);
-    virtual Ptr<OpenGymDataContainer> ExecuteModel(Ptr<OpenGymDataContainer> model);
+    virtual void ExecuteModel(Ptr<OpenGymDataContainer> model);
     // virtual Ptr<OpenGymDataContainer> ExecuteModel(Ptr<OpenGymDataContainer> model);
 
     // void SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface);
@@ -60,11 +60,11 @@ public:
 
     uint32_t m_backoff;
 
-    std::vector<uint32_t> m_model;
+    std::vector<double> m_model;
 
-    bool isFedlearning;
+    bool isFedlearning {false};
 
-    bool isTraining;
+    bool isTraining {true};
 };
 
 }

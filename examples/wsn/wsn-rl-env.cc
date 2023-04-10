@@ -137,39 +137,45 @@ WsnRlGymEnv::GetBackoffRl(uint32_t lostPacketRadio, float sendRate, float Delay)
     m_lostPacketRadio = lostPacketRadio;
     m_sendRate = sendRate;
     m_Delay = Delay;
-    if(isFedLearning)
+    if(isFedlearning)
     {
         return -1;    
     }
     NS_LOG_FUNCTION(this << lostPacketRadio << " " << sendRate << " " << Delay);
     isTraining = true;
+    m_info = "Training";
     Notify();
     isTraining = false;
     return m_backoff;
 }
 
-std::vector<uint32_t> 
+std::vector<double> 
 WsnRlGymEnv::GetMyModel()
 {
     m_info = "GetModel";
     if(isTraining)
     {
-        std::vector<uint32_t> temp(2);
-        return temp;
+        return std::vector<double>();
     }
-    isFedLearning = true;
+    isFedlearning = true;
     Notify();
     return m_model;
 }
 
 void 
-WsnRlGymEnv::RecvModel(std::vector<uint32_t> mode)
+WsnRlGymEnv::RecvModel(std::vector<double> mode)
 {
+    m_model = mode;
     m_info = "RecvModel";
-    
+    if(m_openGymInterface)
+    {
+        m_openGymInterface->RecvModel(mode);
+    }
+    else 
+    {
+        NS_LOG_FUNCTION(this << "m_openGymInterface is zero point");
+    }
 }
-
-
 
 
 bool 
@@ -181,7 +187,7 @@ WsnRlGymEnv::ExecuteActions(Ptr<OpenGymDataContainer> action)
     return true;
 }
 
-Ptr<OpenGymDataContainer> 
+void
 WsnRlGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> action)
 {
     Ptr<OpenGymBoxContainer<uint32_t> > box = DynamicCast<OpenGymBoxContainer<uint32_t> >(action);
@@ -190,7 +196,7 @@ WsnRlGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> action)
         m_model.push_back(box->GetValue(i));
     }
     NS_LOG_INFO ("MyExecuteActions: " << action);
-    return true;
+    return;
 }
 
 

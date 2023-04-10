@@ -45,11 +45,15 @@ public:
   //virtual void GetEnvState(Ptr<OpenGymDataContainer>  &obs, float &reward, bool &done, std::string &info) = 0;
   virtual bool GetGameOver() = 0;
   virtual Ptr<OpenGymDataContainer> GetObservation() = 0;
-  
+  virtual void RecvModel(std::vector<double> model);
+
   virtual float GetReward() = 0;
   virtual std::string GetExtraInfo() = 0;
   virtual bool ExecuteActions(Ptr<OpenGymDataContainer> action) = 0;
-  virtual Ptr<OpenGymDataContainer> ExecuteModel(Ptr<OpenGymDataContainer> model);
+  virtual void ExecuteModel(Ptr<OpenGymDataContainer> model);
+
+  virtual bool GetIsFedLearning();
+  virtual void SetIsFedLearning(bool isFedLearning);
 
   void SetOpenGymInterface(Ptr<OpenGymInterface> openGymInterface);
   void Notify();
@@ -62,6 +66,7 @@ protected:
   virtual void DoDispose (void);
 
   Ptr<OpenGymInterface> m_openGymInterface;
+  bool m_isFedLearning {false};
 private:
 
 };

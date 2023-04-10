@@ -25,7 +25,7 @@ void Test(Ptr<WsnNwkProtocol> from, Ptr<WsnNwkProtocol> to)
     Simulator::ScheduleWithContext(1,Seconds(0.0),&WsnNwkProtocol::Send,
                       from,from->GetNwkShortAddress(),to->GetNwkShortAddress(),
                       Create<Packet>(1),
-                      NwkHeader::NWK_FRAME_DATA);
+                      NwkHeader::NWK_FRAME_DATA,WsnNwkPayload::WSN_PL_NONE);
     // Simulator::ScheduleWithContext(2,Seconds(1.0),&WsnNwkProtocol::Send,
     //                   to,to->GetNwkShortAddress(),from->GetNwkShortAddress(),
     //                   Create<Packet>(31),
@@ -220,7 +220,7 @@ int main()
 
     double sendtime = 225;
 
-    for(int i = 0; i < 7500; i+=6)
+    for(int i = 0; i < 100; i+=6)
     { 
         Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable> ();;
         double delay = uniformRandomVariable->GetValue (0, 0.1);

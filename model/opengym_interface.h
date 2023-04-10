@@ -25,6 +25,7 @@
 #include "ns3/object.h"
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
+#include <vector>
 
 namespace ns3 {
 
@@ -58,10 +59,12 @@ public:
   bool IsGameOver();
 
   bool IsFedLearning();
+  void SetIsFedLearning(bool isFedLearning);
 
   std::string GetExtraInfo();
   bool ExecuteActions(Ptr<OpenGymDataContainer> action);
-  Ptr<OpenGymDataContainer>  ExecuteModel(Ptr<OpenGymDataContainer> model);
+  void ExecuteModel(Ptr<OpenGymDataContainer> model);
+  void RecvModel(std::vector<double> model);
 
   void SetGetActionSpaceCb(Callback< Ptr<OpenGymSpace> > cb);
   void SetGetObservationSpaceCb(Callback< Ptr<OpenGymSpace> > cb);
@@ -80,7 +83,7 @@ public:
 
   void SetExecuteActionsCb(Callback<bool, Ptr<OpenGymDataContainer> > cb);
   // 设置模型接收到的回调动作
-  void SetExecuteModelcb(Callback<Ptr<OpenGymDataContainer>, Ptr<OpenGymDataContainer> > cb);
+  void SetExecuteModelcb(Callback<void, Ptr<OpenGymDataContainer> > cb);
 
 
   void Notify(Ptr<OpenGymEnv> entity);
@@ -103,7 +106,9 @@ private:
   bool m_simEnd;
   bool m_stopEnvRequested;
   bool m_initSimMsgSent;
+  
   bool m_fedLearning;
+  std::vector<double> m_model;
 
   Callback< Ptr<OpenGymSpace> > m_actionSpaceCb;
   Callback< Ptr<OpenGymSpace> > m_observationSpaceCb;
@@ -117,7 +122,7 @@ private:
   Callback<std::string> m_extraInfoCb;
   
   Callback<bool, Ptr<OpenGymDataContainer> > m_actionCb;
-  Callback<Ptr<OpenGymDataContainer>, Ptr<OpenGymDataContainer> > m_modelactionCb;
+  Callback<void, Ptr<OpenGymDataContainer> > m_modelactionCb;
 
 };
 

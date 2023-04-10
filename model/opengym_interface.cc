@@ -183,10 +183,17 @@ OpenGymInterface::SetExecuteActionsCb(Callback<bool, Ptr<OpenGymDataContainer> >
 }
 
 void 
-OpenGymInterface::SetExecuteModelcb(Callback<Ptr<OpenGymDataContainer>, Ptr<OpenGymDataContainer> > cb)
+OpenGymInterface::SetExecuteModelcb(Callback<void, Ptr<OpenGymDataContainer> > cb)
 {
   NS_LOG_FUNCTION(this);
   m_modelactionCb = cb;
+}
+
+void
+OpenGymInterface::RecvModel(std::vector<double> model)
+{
+  m_model = model;
+  NotifyCurrentState();
 }
 
 void 
@@ -270,7 +277,20 @@ OpenGymInterface::NotifyCurrentState()
 
   if(GetExtraInfo() == "RecvModel")
   {
-    Ptr<OpenGymDataContainer> m_modelBox = 
+
+    Ptr<OpenGymBoxContainer<double>> m_modelBox = CreateObject<OpenGymBoxContainer<double> >();
+    for(auto it : m_model)
+    {
+      m_modelBox->AddValue(it);
+    }
+    ns3opengym::EnvModelMsg envModelMsg;
+    envModelMsg.mutable_modedata()->CopyFrom(m_modelBox->GetDataContainerPbMsg());
+
+    zmq::message_t request(envModelMsg.ByteSize());;
+    envModelMsg.SerializeToArray(request.data(), envModelMsg.ByteSize());
+    m_zmq_socket.send (request, zmq::send_flags::none);
+
+    return;
   }
   
   // collect current env state
@@ -312,11 +332,9 @@ OpenGymInterface::NotifyCurrentState()
   NS_LOG_FUNCTION (this << "-----------------------Waiting for responed-----------------------------\n");
   NS_LOG_FUNCTION (this << "------------------------------------------------------------------------\n");
  
+
  
-  // 如果不是SendModel整数倍的话，就是py那边反馈还是action
- 
- 
-  if(!m_fedLearning) 
+  if(!m_fedLearning || GetExtraInfo() == "Training") 
   {
     // receive act msg form python
     ns3opengym::EnvActMsg envActMsg;
@@ -346,9 +364,7 @@ OpenGymInterface::NotifyCurrentState()
     ExecuteActions(actDataContainer);
     
   } 
-  // 防止Q表过大一次性读完
-  else 
-  
+  else if(GetExtraInfo() == "GetModel")
   {
     // 使用 zmq::recv_multipart() 方法一次性读取所有帧
     // m_zmq_socket_mutipart.recv(m_zmq_socket);
@@ -388,34 +404,8 @@ OpenGymInterface::NotifyCurrentState()
 
     ns3opengym::DataContainer modelDataContainerPbMsg = envModelMsg.modedata();
     Ptr<OpenGymDataContainer> modelDataContainer = OpenGymDataContainer::CreateFromDataContainerPbMsg(modelDataContainerPbMsg);
-    Ptr<OpenGymDataContainer> replyModel = ExecuteModel(modelDataContainer); 
-    if(replyModel) 
-    {
-      // 暂时不考虑传输大模块
-      // std::string message_str = 
-      // const size_t chunk_size = 1024 * 1024;  // 1 MB
-      // const size_t message_len = message_str.size();
-
-      // for (size_t pos = 0; pos < message_len; pos += chunk_size) {
-      //     size_t chunk_len = std::min(chunk_size, message_len - pos);
-      //     zmq::message_t chunk(chunk_len);
-      //     memcpy(chunk.data(), message_str.data() + pos, chunk_len);
-      //     socket.send(chunk, pos + chunk_len < message_len ? ZMQ_SNDMORE : 0);
-      // }
-      ns3opengym::EnvModelMsg envModelMsg;
-      ns3opengym::DataContainer modeDataContainerPbMsg;
-      modeDataContainerPbMsg = replyModel->GetDataContainerPbMsg();
-      envModelMsg.mutable_modedata()->CopyFrom(obsDataContainerPbMsg);
-      zmq::message_t request(envModelMsg.ByteSize());;
-      envModelMsg.SerializeToArray(request.data(), envStateMsg.ByteSize());
-      m_zmq_socket.send (request, zmq::send_flags::none);
-    }
-    else 
-    {
-      NS_LOG_ERROR("replyModel is nullpoint!!!!");
-    }
+    
   }
-  m_trainLoop += 1;
   return;
 }
 
@@ -454,6 +444,13 @@ OpenGymInterface::IsFedLearning()
 {
   NS_LOG_FUNCTION(this);
   return m_fedLearning;
+}
+
+void 
+OpenGymInterface::SetIsFedLearning(bool isFedLearning)
+{
+  NS_LOG_FUNCTION(this);
+  isFedLearning = m_fedLearning;
 }
 
 Ptr<OpenGymSpace>
@@ -540,16 +537,15 @@ OpenGymInterface::ExecuteActions(Ptr<OpenGymDataContainer> action)
   return reply;
 }
 
-Ptr<OpenGymDataContainer>
+void
 OpenGymInterface::ExecuteModel(Ptr<OpenGymDataContainer> model)
 {
   NS_LOG_FUNCTION (this);
-  Ptr<OpenGymDataContainer> reply = 0;
   if(m_modelactionCb.IsNull())
   {
-    reply = m_modelactionCb(model);
+    m_modelactionCb(model);
   }
-  return reply;
+  return;
 }
 
 void
