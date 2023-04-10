@@ -233,7 +233,7 @@ class Ns3ZmqBridge(object):
         return True
 
     #dcj
-    def send_model(self, model):
+    def send_model_(self, model):
         reply = pb.EnvModelMsg()
         
         ModelMsg = self._pack_data(model, self._model_space)
@@ -428,6 +428,9 @@ class Ns3Env(gym.Env):
         response = self.ns3ZmqBridge.step(action)
         self.envDirty = True
         return self.get_state()
+    
+    def send_model(slef,model):
+        self.ns3ZmqBridge.send_model_(model)
 
     def reset(self):
         if not self.envDirty:

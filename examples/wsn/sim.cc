@@ -138,13 +138,15 @@ int main()
     helper.CreateAndAggregateObjectFromTypeId(n2,"ns3::WsnNwkProtocol");
     Ptr<WsnNwkProtocol> nwk2 = n2->GetObject<WsnNwkProtocol>();
     nwk2->SetNodeType(NODE_TYPE::EDGE);
+    nwk2->SetGetModelCallBack(MakeCallback(&WsnRlGymEnv::GetMyModel,myGymEnv));
 
     // Ptr<WsnNwkProtocol> nwk3 = CreateObject<WsnNwkProtocol>(NODE_TYPE::ROUTE);
     helper.CreateAndAggregateObjectFromTypeId(n3,"ns3::WsnNwkProtocol");
     Ptr<WsnNwkProtocol> nwk3 = n3->GetObject<WsnNwkProtocol>();
     nwk3->SetNodeType(NODE_TYPE::ROUTE);
+    nwk3->SetGetModelCallBack(MakeCallback(&WsnRlGymEnv::GetMyModel,myGymEnv1));
 
-    
+
     //Ptr<WsnNwkProtocol> nwk4 = CreateObject<WsnNwkProtocol>(NODE_TYPE::EDGE);
     helper.CreateAndAggregateObjectFromTypeId(n4,"ns3::WsnNwkProtocol");
     Ptr<WsnNwkProtocol> nwk4 = n4->GetObject<WsnNwkProtocol>();
@@ -219,7 +221,8 @@ int main()
                         nwk4,nwk3);        
 
     double sendtime = 225;
-
+    Simulator::Schedule(Seconds(sendtime+5),&WsnNwkProtocol::GetModel,nwk2);
+    Simulator::Schedule(Seconds(sendtime+5),&WsnNwkProtocol::GetModel,nwk3);
     for(int i = 0; i < 1000; i+=6)
     { 
         Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable> ();;
@@ -229,7 +232,7 @@ int main()
         Simulator::Schedule(Seconds(sendtime+(i+2)*delay),&Test,nwk4,nwk1);
         Simulator::Schedule(Seconds(sendtime+(i+3)*delay),&Test,nwk1,nwk4);
         Simulator::Schedule(Seconds(sendtime+(i+4)*delay),&Test,nwk2,nwk4);    
-        Simulator::Schedule(Seconds(sendtime+(i+5)*delay),&Test,nwk4,nwk2);    
+        Simulator::Schedule(Seconds(sendtime+(i+5)*delay),&Test,nwk4,nwk2);
     }
 
 
