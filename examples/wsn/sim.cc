@@ -220,7 +220,7 @@ int main()
 
     double sendtime = 225;
 
-    for(int i = 0; i < 100; i+=6)
+    for(int i = 0; i < 1000; i+=6)
     { 
         Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable> ();;
         double delay = uniformRandomVariable->GetValue (0, 0.1);

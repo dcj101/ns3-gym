@@ -404,7 +404,7 @@ OpenGymInterface::NotifyCurrentState()
 
     ns3opengym::DataContainer modelDataContainerPbMsg = envModelMsg.modedata();
     Ptr<OpenGymDataContainer> modelDataContainer = OpenGymDataContainer::CreateFromDataContainerPbMsg(modelDataContainerPbMsg);
-    
+    ExecuteModel(modelDataContainer);
   }
   return;
 }

@@ -175,6 +175,7 @@ WsnRlGymEnv::RecvModel(std::vector<double> mode)
     {
         NS_LOG_FUNCTION(this << "m_openGymInterface is zero point");
     }
+    isFedlearning = false;
 }
 
 
@@ -190,7 +191,7 @@ WsnRlGymEnv::ExecuteActions(Ptr<OpenGymDataContainer> action)
 void
 WsnRlGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> action)
 {
-    Ptr<OpenGymBoxContainer<uint32_t> > box = DynamicCast<OpenGymBoxContainer<uint32_t> >(action);
+    Ptr<OpenGymBoxContainer<double> > box = DynamicCast<OpenGymBoxContainer<double> >(action);
     for(int i = 0 ; i < 200; ++ i)
     {
         m_model.push_back(box->GetValue(i));
@@ -198,6 +199,7 @@ WsnRlGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> action)
     NS_LOG_INFO ("MyExecuteActions: " << action);
     return;
 }
+
 
 
 }

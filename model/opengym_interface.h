@@ -121,7 +121,7 @@ private:
   Callback<float> m_rewardCb;
   Callback<std::string> m_extraInfoCb;
   
-  Callback<bool, Ptr<OpenGymDataContainer> > m_actionCb;
+  Callback<bool, Ptr<OpenGymDataContainer> >  m_actionCb;
   Callback<void, Ptr<OpenGymDataContainer> > m_modelactionCb;
 
 };

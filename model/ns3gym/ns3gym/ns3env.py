@@ -207,8 +207,6 @@ class Ns3ZmqBridge(object):
 
         self.newStateRx = True
 
-    def rx_env_model(self):
-
 
     def send_close_command(self):
         reply = pb.EnvActMsg()

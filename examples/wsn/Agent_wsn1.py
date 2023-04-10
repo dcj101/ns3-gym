@@ -131,6 +131,11 @@ for e in range(total_episodes):
 
         next_state, reward, done, info = env.step(actions)
 
+        if info == "GetModel" :
+            output_layer_weights = model.layers[-1].get_weights()[0]
+            env.send_model(output_layer_weights)
+            time.sleep(10)
+            break
         
         print(next_state,reward,done,info)
         if done:

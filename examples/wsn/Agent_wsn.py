@@ -131,6 +131,13 @@ for e in range(total_episodes):
 
         next_state, reward, done, info = env.step(actions)
         print(next_state,reward,done,info)
+
+        if info == "GetModel" :
+            output_layer_weights = model.layers[-1].get_weights()[0]
+            env.send_model(output_layer_weights)
+            time.sleep(10)
+            break
+
         if done:
             print("episode: {}/{}, time: {}, rew: {}, eps: {:.2}"
                   .format(e, total_episodes, time, rewardsum, epsilon))
