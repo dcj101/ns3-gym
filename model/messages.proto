@@ -9,13 +9,14 @@ enum MsgType {
 	Init = 1;
 	ActionSpace = 2;
 	ObservationSpace = 3;
-	IsGameOver = 4;
-	Observation = 5;
-	Reward = 6;
-	ExtraInfo = 7;
-	Action = 8;
-	Model = 9;
-	StopEnv = 10;
+	ModelSpace = 4;
+	IsGameOver = 5;
+	Observation = 6;
+	Reward = 7;
+	ExtraInfo = 8;
+	Action = 9;
+	Model = 10;
+	StopEnv = 11;
 }
 
 enum SpaceType {

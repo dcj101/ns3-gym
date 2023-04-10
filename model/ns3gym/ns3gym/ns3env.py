@@ -324,7 +324,7 @@ class Ns3ZmqBridge(object):
 
     def _pack_data(self, actions, spaceDesc):
         dataContainer = pb.DataContainer()
-
+        print("pack_data!!!!!!!!!!!!!")
         spaceType = spaceDesc.__class__
 
         if spaceType == spaces.Discrete:
@@ -332,7 +332,7 @@ class Ns3ZmqBridge(object):
             discreteContainerPb = pb.DiscreteDataContainer()
             discreteContainerPb.data = actions
             dataContainer.data.Pack(discreteContainerPb)
-
+            print("DisCrete")
         elif spaceType == spaces.Box:
             dataContainer.type = pb.Box
             boxContainerPb = pb.BoxDataContainer()
@@ -342,29 +342,29 @@ class Ns3ZmqBridge(object):
             if (spaceDesc.dtype in ['int', 'int8', 'int16', 'int32', 'int64']):
                 boxContainerPb.dtype = pb.INT
                 boxContainerPb.intData.extend(actions)
-
+                print("int")
             elif (spaceDesc.dtype in ['uint', 'uint8', 'uint16', 'uint32', 'uint64']):
                 boxContainerPb.dtype = pb.UINT
                 boxContainerPb.uintData.extend(actions)
-
+                print("uint")
             elif (spaceDesc.dtype in ['float', 'float32', 'float64']):
                 boxContainerPb.dtype = pb.FLOAT
                 boxContainerPb.floatData.extend(actions)
-
+                print("float")
             elif (spaceDesc.dtype in ['double']):
                 boxContainerPb.dtype = pb.DOUBLE
                 boxContainerPb.doubleData.extend(actions)
-
+                print("double")
             else:
                 boxContainerPb.dtype = pb.FLOAT
                 boxContainerPb.floatData.extend(actions)
-
+                print("float?????")
             dataContainer.data.Pack(boxContainerPb)
 
         elif spaceType == spaces.Tuple:
             dataContainer.type = pb.Tuple
             tupleDataPb = pb.TupleDataContainer()
-
+            print("Tuple")
             spaceList = list(self._action_space.spaces)
             subDataList = []
             for subAction, subActSpaceType in zip(actions, spaceList):
@@ -377,7 +377,7 @@ class Ns3ZmqBridge(object):
         elif spaceType == spaces.Dict:
             dataContainer.type = pb.Dict
             dictDataPb = pb.DictDataContainer()
-
+            print("Dict")
             subDataList = []
             for sName, subAction in actions.items():
                 subActSpaceType = self._action_space.spaces[sName]

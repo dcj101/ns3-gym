@@ -335,6 +335,7 @@ OpenGymInterface::NotifyCurrentState()
 
   NS_LOG_FUNCTION (this << " m_f " << m_fedLearning << " extrainfo " << GetExtraInfo());
   if(!m_fedLearning || GetExtraInfo() == "Training") 
+  // if(1)
   {
     // receive act msg form python
     ns3opengym::EnvActMsg envActMsg;
@@ -385,15 +386,18 @@ OpenGymInterface::NotifyCurrentState()
     zmq::message_t reply;
     (void) m_zmq_socket.recv (reply, zmq::recv_flags::none);
     envModelMsg.ParseFromArray(reply.data(), reply.size());
-    
+    NS_LOG_FUNCTION(this << "i recv model !!!!");
+    NS_LOG_FUNCTION(this << "i recv model !!!! " << reply.size() << (char*)reply.data());
     if (m_simEnd) 
     {
       return;
     }
 
     bool stopSim = envModelMsg.stopsimreq();
+    NS_LOG_FUNCTION(this << " stop Sim is " << stopSim);
     if (stopSim) 
-    {
+    // if(1)
+    { 
       NS_LOG_DEBUG("---Stop requested: " << stopSim);
       m_stopEnvRequested = true;
       Simulator::Stop();
@@ -540,7 +544,7 @@ void
 OpenGymInterface::ExecuteModel(Ptr<OpenGymDataContainer> model)
 {
   NS_LOG_FUNCTION (this);
-  if(m_modelactionCb.IsNull())
+  if(!m_modelactionCb.IsNull())
   {
     m_modelactionCb(model);
   }

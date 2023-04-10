@@ -191,8 +191,8 @@ WsnRlGymEnv::ExecuteActions(Ptr<OpenGymDataContainer> action)
 void
 WsnRlGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> action)
 {
-    Ptr<OpenGymBoxContainer<double> > box = DynamicCast<OpenGymBoxContainer<double> >(action);
-    for(int i = 0 ; i < 200; ++ i)
+    Ptr<OpenGymBoxContainer<float> > box = DynamicCast<OpenGymBoxContainer<float> >(action);
+    for(uint32_t i = 0 ; i < 200; ++ i)
     {
         m_model.push_back(box->GetValue(i));
     }

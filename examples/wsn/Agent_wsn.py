@@ -47,10 +47,11 @@ env.reset()
 
 ob_space = env.observation_space
 ac_space = env.action_space
+mo_space = env.model_space
 
 print("Observation space: ", ob_space,  ob_space.dtype)
 print("Action space: ", ac_space, ac_space.dtype)
-
+print("Model space: ", mo_space, mo_space.dtype)
 
 # def get_agent(obs):
 #     print("hello IIIIIIIIIIIIIIIIIIII")
@@ -90,7 +91,7 @@ model.compile(optimizer=tf.train.AdamOptimizer(0.001),
               metrics=['accuracy'])
 
 total_episodes = 16
-max_env_steps = 1000
+max_env_steps = 5500
 env._max_episode_steps = max_env_steps
 
 epsilon = 1              # exploration rate
@@ -106,6 +107,7 @@ No_step = 0
 reward = 0
 done = False
 info = None
+RecvModel = True
 # action_mapping = [2 ** i for i in range(a_size)]
 action_mapping = [i for i in range(a_size)]
 U_new =0
@@ -128,7 +130,6 @@ for e in range(total_episodes):
             action_index = np.argmax(model.predict(obs)[0])
             print(action_index)
         actions = [action_mapping[action_index]]
-
         next_state, reward, done, info = env.step(actions)
         print(next_state,reward,done,info)
 
@@ -137,9 +138,13 @@ for e in range(total_episodes):
             for i, layer_weights in enumerate(weights):
                 print("Layer {} weights shape: {}".format(i, layer_weights.shape))
                 if i == 5:
-                    isSend = env.send_model(layer_weights)
+                    isSend = env.send_model(layer_weights.tolist())
+                    print(layer_weights)
+                    RecvModel = False
+                    while 1:
+                        RecvModel = False
                     break
-
+        
         if done:
             print("episode: {}/{}, time: {}, rew: {}, eps: {:.2}"
                   .format(e, total_episodes, time, rewardsum, epsilon))
