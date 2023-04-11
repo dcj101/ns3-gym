@@ -295,6 +295,8 @@ OpenGymInterface::NotifyCurrentState()
     envModelMsg.SerializeToArray(request.data(), envModelMsg.ByteSize());
     m_zmq_socket.send (request, zmq::send_flags::none);
 
+    zmq::message_t reply;
+    (void) m_zmq_socket.recv (reply, zmq::recv_flags::none);
     return;
   }
   

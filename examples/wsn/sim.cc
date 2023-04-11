@@ -140,12 +140,14 @@ int main()
     Ptr<WsnNwkProtocol> nwk2 = n2->GetObject<WsnNwkProtocol>();
     nwk2->SetNodeType(NODE_TYPE::EDGE);
     nwk2->SetGetModelCallBack(MakeCallback(&WsnRlGymEnv::GetMyModel,myGymEnv));
+    nwk2->SetRecvModelCallBack(MakeCallback(&WsnRlGymEnv::RecvModel,myGymEnv));
 
     // Ptr<WsnNwkProtocol> nwk3 = CreateObject<WsnNwkProtocol>(NODE_TYPE::ROUTE);
     helper.CreateAndAggregateObjectFromTypeId(n3,"ns3::WsnNwkProtocol");
     Ptr<WsnNwkProtocol> nwk3 = n3->GetObject<WsnNwkProtocol>();
     nwk3->SetNodeType(NODE_TYPE::ROUTE);
     nwk3->SetGetModelCallBack(MakeCallback(&WsnRlGymEnv::GetMyModel,myGymEnv1));
+    nwk3->SetRecvModelCallBack(MakeCallback(&WsnRlGymEnv::RecvModel,myGymEnv1));
 
 
     //Ptr<WsnNwkProtocol> nwk4 = CreateObject<WsnNwkProtocol>(NODE_TYPE::EDGE);

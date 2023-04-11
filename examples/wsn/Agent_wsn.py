@@ -142,7 +142,7 @@ for e in range(total_episodes):
                     print(layer_weights)
                     print("marge : ",isSend)
                     RecvModel = False
-                    while 1:
+                    while 0:
                         RecvModel = False
                     break
         
