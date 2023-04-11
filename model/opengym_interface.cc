@@ -276,10 +276,7 @@ OpenGymInterface::NotifyCurrentState()
   {
     return;
   }
-  if (m_simEnd) 
-  {
-    return;
-  }
+
   if(GetExtraInfo() == "RecvModel")
   {
 

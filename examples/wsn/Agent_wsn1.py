@@ -91,7 +91,7 @@ model.compile(optimizer=tf.train.AdamOptimizer(0.001),
               metrics=['accuracy'])
 
 total_episodes = 16
-max_env_steps = 5500
+max_env_steps = 55000
 env._max_episode_steps = max_env_steps
 
 epsilon = 1              # exploration rate
@@ -191,11 +191,11 @@ for e in range(total_episodes):
 
   
         print("reward sum", rewardsum)
-        if obs[0,1] < 400:
+        if obs[0,1] < 400 :
             packlost.append(obs[0,0])
             packrate.append(obs[0,1])
             packedelay.append(obs[0,2])
-            packaction.append(action_index)
+            # packaction.append(action_index)
 
     print("---------------------------------------------------------")
     weights = model.get_weights()   

@@ -226,10 +226,10 @@ int main()
     double sendtime = 225;
     Simulator::Schedule(Seconds(sendtime+5),&WsnNwkProtocol::GetModel,nwk2);
     Simulator::Schedule(Seconds(sendtime+5),&WsnNwkProtocol::GetModel,nwk3);
-    for(int i = 0; i < 20; i+=6)
+    for(int i = 0; i < 2500; i+=6)
     { 
         Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable> ();;
-        double delay = uniformRandomVariable->GetValue (10, 100);
+        double delay = uniformRandomVariable->GetValue (0, 0.1);
         Simulator::Schedule(Seconds(sendtime+(i+0)*delay),&Test,nwk2,nwk1);
         Simulator::Schedule(Seconds(sendtime+(i+1)*delay),&Test,nwk1,nwk2);
         Simulator::Schedule(Seconds(sendtime+(i+2)*delay),&Test,nwk4,nwk1);
@@ -242,7 +242,7 @@ int main()
 
     bool TraceMetric = 1;
 
-    Simulator::Stop(Seconds(25000));
+    Simulator::Stop(Seconds(250));
     Simulator::Run ();
 
     uint32_t SentPackets = 0;
@@ -300,6 +300,7 @@ int main()
 
     Simulator::Destroy ();
     openGymInterface->NotifySimulationEnd();
+    openGymInterface1->NotifySimulationEnd();
     return 0;
 
 }
