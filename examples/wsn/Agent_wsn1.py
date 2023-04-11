@@ -138,9 +138,13 @@ for e in range(total_episodes):
             for i, layer_weights in enumerate(weights):
                 print("Layer {} weights shape: {}".format(i, layer_weights.shape))
                 if i == 5:
+                    print(len(layer_weights.tolist()))
                     isSend = env.send_model(layer_weights.tolist())
                     print(layer_weights)
                     print("marge : ",isSend)
+                    np.reshape(isSend,[1,a_size])
+                    weights[5] = isSend
+                    model.set_weights(weights)
                     RecvModel = False
                     while 0:
                         RecvModel = False

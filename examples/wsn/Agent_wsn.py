@@ -138,9 +138,13 @@ for e in range(total_episodes):
             for i, layer_weights in enumerate(weights):
                 print("Layer {} weights shape: {}".format(i, layer_weights.shape))
                 if i == 5:
+                    print(len(layer_weights.tolist()))
                     isSend = env.send_model(layer_weights.tolist())
                     print(layer_weights)
                     print("marge : ",isSend)
+                    np.reshape(isSend,[1,a_size])
+                    weights[5] = isSend
+                    model.set_weights(weights)
                     RecvModel = False
                     while 0:
                         RecvModel = False
@@ -191,7 +195,7 @@ for e in range(total_episodes):
 
   
         print("reward sum", rewardsum)
-        if obs[0,1] < 400:
+        if obs[0,1] < 400 :
             packlost.append(obs[0,0])
             packrate.append(obs[0,1])
             packedelay.append(obs[0,2])
@@ -219,7 +223,7 @@ for e in range(total_episodes):
     # plt.legend(prop={'size': 12})
     # plt.savefig('learning.pdf', bbox_inches='tight')
     # plt.show() 
-    print("Plot Learning Performance")
+    print("Plot Learning Performance wsn0")
     mpl.rcdefaults()
     mpl.rcParams.update({'font.size': 16})
     fig, ax = plt.subplots(figsize=(10,4))

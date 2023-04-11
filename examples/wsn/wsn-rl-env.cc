@@ -192,6 +192,7 @@ void
 WsnRlGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> action)
 {
     Ptr<OpenGymBoxContainer<float> > box = DynamicCast<OpenGymBoxContainer<float> >(action);
+    m_model.clear();
     for(uint32_t i = 0 ; i < 200; ++ i)
     {
         m_model.push_back(box->GetValue(i));
