@@ -47,56 +47,34 @@ env.reset()
 
 ob_space = env.observation_space
 ac_space = env.action_space
-mo_space = env.model_space
+# mo_space = env.model_space
 
 print("Observation space: ", ob_space,  ob_space.dtype)
 print("Action space: ", ac_space, ac_space.dtype)
-print("Model space: ", mo_space, mo_space.dtype)
-
-# def get_agent(obs):
-#     print("hello IIIIIIIIIIIIIIIIIIII")
-#     time.sleep
-#     socketUuid = obs[0]
-#     tcpEnvType = obs[1]
-#     tcpAgent = get_agent.tcpAgents.get(socketUuid, None)
-#     if tcpAgent is None:
-#         if tcpEnvType == 0:
-#             # event-based = 0
-#             tcpAgent = TcpNewReno()
-#         else:
-#             # time-based = 1
-#             tcpAgent = TcpTimeBased()
-#         tcpAgent.set_spaces(get_agent.ob_space, get_agent.ac_space)
-#         get_agent.tcpAgents[socketUuid] = tcpAgent
-
-#     return tcpAgent
-
-# # initialize variable
-# get_agent.tcpAgents = {}
-# get_agent.ob_space = ob_space
-# get_agent.ac_space = ac_space
+# print("Model space: ", mo_space, mo_space.dtype)
 
 s_size = ob_space.shape[0]
 print("State size: ",ob_space.shape[0])
 
-a_size = 200
+a_size = 16
 print("Action size: ", a_size)
 
 model = keras.Sequential()
 model.add(keras.layers.Dense(s_size, input_shape=(s_size,), activation='relu'))
 model.add(keras.layers.Dense(s_size, input_shape=(s_size,), activation='relu'))
 model.add(keras.layers.Dense(a_size, activation='softmax'))
-model.compile(optimizer=tf.train.AdamOptimizer(0.001),
+model.compile(optimizer=tf.train.AdamOptimizer(0.0001),
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 total_episodes = 16
-max_env_steps = 55000
+max_env_steps = 155000
 env._max_episode_steps = max_env_steps
 
 epsilon = 1              # exploration rate
-epsilon_min = 0.01
-epsilon_decay = 0.999
+epsilon_min = 0.001
+epsilon_decay = 0.9992
+# epsilon_decay = 1
 
 packlost = []
 packrate = []
@@ -151,22 +129,16 @@ for e in range(total_episodes):
                     break
         
         if done:
-            print("episode: {}/{}, time: {}, rew: {}, eps: {:.2}"
-                  .format(e, total_episodes, time, rewardsum, epsilon))
             break
-        # old的网络状态赋值
-        U_old=0.9*(obs[0,0])+0.1*(obs[0,1])+0.3*(obs[0,2])
 
+        U_old=0.92*(np.log(obs[0,0]))-0.1*(np.log(obs[0,1]))+0.3*(obs[0,2])
         next_state = np.reshape(next_state, [1, s_size])
-                # 评估网络状态
-        U_new=0.9*(next_state[0,0])+0.1*(next_state[0,1])+0.3*(next_state[0,2])
-        
+        U_new=0.92*(np.log(next_state[0,0]))-0.1*(np.log(next_state[0,1]))+0.3*(next_state[0,2]) 
         U=U_new-U_old
         print("U is :",U)
-        # 如果网络状态变差了 reward=-5 误差范围是0.05
-        if U <-0.35:
-            reward=10
-        elif U >0.35:
+        if U <-0.01:
+            reward=6
+        elif U >0.0001:
             reward=-5
         else:
             reward=0
@@ -174,7 +146,8 @@ for e in range(total_episodes):
         # Train
         target = reward
         if not done:
-            target = (reward + 0.95 * np.amax(model.predict(next_state)[0]))
+            target = (reward + 0.98 * np.amax(model.predict(next_state)[0]))
+        print("tag is ",target)
         # 这是输出所有的所以动作的概率
         target_f = model.predict(obs)
         # print("target :", target_f)
@@ -195,11 +168,11 @@ for e in range(total_episodes):
 
   
         print("reward sum", rewardsum)
-        if obs[0,1] < 400 :
+        if obs[0,1] < 10000 and obs[0,1] > 0:
             packlost.append(obs[0,0])
             packrate.append(obs[0,1])
             packedelay.append(obs[0,2])
-            # packaction.append(action_index)
+            # packaction.append(action_index*10)
 
     print("---------------------------------------------------------")
     weights = model.get_weights()   
@@ -223,17 +196,18 @@ for e in range(total_episodes):
     # plt.legend(prop={'size': 12})
     # plt.savefig('learning.pdf', bbox_inches='tight')
     # plt.show() 
+    
     print("Plot Learning Performance wsn0")
     mpl.rcdefaults()
     mpl.rcParams.update({'font.size': 16})
     fig, ax = plt.subplots(figsize=(10,4))
     plt.grid(True, linestyle='--')
     plt.title('Learning Performance')
-    gap = 1
-    plt.plot(range(0, len(packlost), gap), packlost[::gap], label='packlost', marker="^", linestyle=":")
-    plt.plot(range(0, len(packrate), gap), packrate[::gap], label='packrate', marker="", linestyle="-")
-    plt.plot(range(0, len(packedelay), gap), packedelay[::gap], label='packedelay', marker="", linestyle="-"),
-    plt.plot(range(0, len(packaction), gap), packaction[::gap], label='packaction', marker="", linestyle="-")
+    gap = 15
+    plt.plot(range(0, len(packlost), gap), packlost[::gap], label='packetlost', marker="^", linestyle=":")
+    plt.plot(range(0, len(packrate), gap), packrate[::gap], label='packetrate', marker="", linestyle="-")
+    plt.plot(range(0, len(packedelay), gap), packedelay[::gap], label='packetdelay', marker="", linestyle="-"),
+    plt.plot(range(0, len(packaction), gap), packaction[::gap], label='packetaction', marker="", linestyle="-")
     plt.xlabel('Episode')
     plt.ylabel('Steps')
     plt.legend(prop={'size': 12})
@@ -273,8 +247,8 @@ for e in range(total_episodes):
     # axs[1, 1].set_xlabel('Episode')
     # axs[1, 1].set_ylabel('Steps')
 
-    plt.tight_layout()
-    plt.subplots_adjust(top=0.88)
-    plt.savefig('learning.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.tight_layout()
+    # plt.subplots_adjust(top=0.88)
+    # plt.savefig('learning.pdf', bbox_inches='tight')
+    # plt.show()
 

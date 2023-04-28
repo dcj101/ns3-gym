@@ -77,7 +77,7 @@ WsnRlGymEnv::GetObservationSpace()
 Ptr<OpenGymSpace> 
 WsnRlGymEnv::GetModelSpace()
 {
-    uint32_t parameterNum = 200;
+    uint32_t parameterNum = 16;
     float low = 0.0;
     float hight = 1000000.0;
     std::vector<uint32_t> shape = {parameterNum,};
@@ -111,7 +111,7 @@ WsnRlGymEnv::GetObservation()
     Ptr<OpenGymBoxContainer<uint64_t> > box = CreateObject<OpenGymBoxContainer<uint64_t> > (shape);
 
     box->AddValue(m_lostPacketRadio);
-    box->AddValue(m_sendRate*100);
+    box->AddValue(m_sendRate*10);
     box->AddValue(m_Delay*100);
 
     NS_LOG_INFO ("MyGetObservation: " << box);
@@ -193,7 +193,7 @@ WsnRlGymEnv::ExecuteModel(Ptr<OpenGymDataContainer> action)
 {
     Ptr<OpenGymBoxContainer<float> > box = DynamicCast<OpenGymBoxContainer<float> >(action);
     m_model.clear();
-    for(uint32_t i = 0 ; i < 200; ++ i)
+    for(uint32_t i = 0 ; i < 16; ++ i)
     {
         m_model.push_back(box->GetValue(i));
     }
